@@ -2,7 +2,7 @@ import { Markup, Telegraf } from "telegraf";
 import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
-// import { BUTTONS } from "../config/buttons";
+import { BUTTONS } from "../config/buttons";
 
 export class StartCommand extends Command {
   constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
@@ -11,15 +11,15 @@ export class StartCommand extends Command {
   }
 
   handle(): void {
-    // const buttons = BUTTONS.startMenu.map(button => 
-    //   Markup.button.callback(button.name, button.value)
-    // );
+    const buttons = BUTTONS.startMenu.map(button => 
+      Markup.button.callback(button.name, button.value)
+    );
 
     this.bot.start(async(ctx) => {
       const id = String(ctx.from?.id);
       this.checkUserSession(id);
 
-      // ctx.reply("Для начала роботы с ботом нажмите ниже", Markup.inlineKeyboard(buttons));
+      ctx.reply("Для начала роботы с ботом нажмите ниже", Markup.inlineKeyboard(buttons));
     });
   }
 }
