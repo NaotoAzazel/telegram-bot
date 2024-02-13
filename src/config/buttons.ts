@@ -26,7 +26,7 @@ export const BUTTONS: ButtonsConfig = {
     { name: "Выбрать жанр", value: "genre" },
     { name: "Сбросить", value: "reset" },
     { name: "Искать по фильтру", value: "searchByFilter" },
-    { name: "Назад", value: "back" }
+    { name: "Назад", value: "menu" }
   ]
 }
 

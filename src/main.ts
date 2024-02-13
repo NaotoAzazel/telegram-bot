@@ -8,6 +8,8 @@ import { IDatabase } from "./service/database.interface";
 import { DatabaseService } from "./service/database.service";
 import { ISessionService } from "./service/session.interface";
 import { SessionService } from "./service/session.service";
+import { FilterCommand } from "./commands/filter.command";
+import { MenuCommand } from "./commands/menu.command";
 
 class Bot {
   bot: Telegraf<IBotContext>;
@@ -22,7 +24,11 @@ class Bot {
   }
 
   start() {
-    this.commands = [new StartCommand(this.bot, this.session)];
+    this.commands = [
+      new StartCommand(this.bot, this.session), 
+      new FilterCommand(this.bot, this.session), 
+      new MenuCommand(this.bot, this.session)
+    ];
     for(const command of this.commands) {
       command.handle();
     }
