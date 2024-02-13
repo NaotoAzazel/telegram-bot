@@ -3,15 +3,11 @@ import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
 import { BUTTONS } from "../config/buttons";
-import { MenuCommand } from "./menu.command";
 
 export class FilterCommand extends Command {
-  private menuCommand: MenuCommand;
-  
   constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
     super(bot);
     this.session = session;
-    this.menuCommand = new MenuCommand(bot, session);
   }
 
   handle(): void {
@@ -22,9 +18,5 @@ export class FilterCommand extends Command {
     this.bot.action("filter", (ctx) => {
       ctx.editMessageText("Меню фильтров", Markup.inlineKeyboard(buttons, { columns: 2 }));
     });
-
-    this.bot.action("back", () => {
-      this.menuCommand.handle();
-    })
   }
 }
