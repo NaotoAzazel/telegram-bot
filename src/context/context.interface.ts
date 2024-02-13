@@ -1,7 +1,14 @@
 import { Context } from "telegraf";
 
 export interface SessionData {
-  exampleField: boolean;
+  id: string;
+  startYear?: string;
+  endYear?: string;
+  minRating?: string;
+  maxRating?: string;
+  genre?: string;
+  type?: string;
+  createdAt: Date;
 }
 
 export interface IBotContext extends Context {

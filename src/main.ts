@@ -4,23 +4,31 @@ import { ConfigService } from "./config/config.service";
 import { IBotContext } from "./context/context.interface";
 import { Command } from "./commands/command.class";
 import { StartCommand } from "./commands/start.command";
-import LocalSession from "telegraf-session-local";
+import { IDatabase } from "./service/database.interface";
+import { DatabaseService } from "./service/database.service";
+import { ISessionService } from "./service/session.interface";
+import { SessionService } from "./service/session.service";
 
 class Bot {
   bot: Telegraf<IBotContext>;
   commands: Command[] = [];
+  database: IDatabase;
+  session: ISessionService;
   
   constructor(private readonly configService: IConfigService) {
     this.bot = new Telegraf<IBotContext>(this.configService.get("BOT_TOKEN"));
-    this.bot.use((new LocalSession({ database: "sessions.json" })).middleware());
+    this.database = new DatabaseService(this.configService.get("MONGO_URL"));
+    this.session = new SessionService();
   }
 
   start() {
-    this.commands = [new StartCommand(this.bot)];
+    this.commands = [new StartCommand(this.bot, this.session)];
     for(const command of this.commands) {
       command.handle();
     }
+    this.database.connect();
     this.bot.launch();
+    console.log("Bot successfully start");
   }
 }
 

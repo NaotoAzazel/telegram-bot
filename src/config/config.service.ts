@@ -18,7 +18,7 @@ export class ConfigService implements IConfigService {
   get(key: string): string {
     const res = this.config[key];
     if(!res) {
-      throw new Error("There is no such key")
+      throw new Error(`There is no such key: ${key}`);
     }
     return res;
   }
