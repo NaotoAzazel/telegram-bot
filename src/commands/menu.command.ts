@@ -4,7 +4,7 @@ import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
 import { BUTTONS } from "../config/buttons";
 
-export class MenuCommand extends Command {
+export default class MenuCommand extends Command {
   constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
     super(bot);
     this.session = session;

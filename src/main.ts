@@ -2,18 +2,16 @@ import { Telegraf } from "telegraf";
 import { IConfigService } from "./config/config.interface";
 import { ConfigService } from "./config/config.service";
 import { IBotContext } from "./context/context.interface";
-import { Command } from "./commands/command.class";
-import { StartCommand } from "./commands/start.command";
 import { IDatabase } from "./service/database.interface";
 import { DatabaseService } from "./service/database.service";
 import { ISessionService } from "./service/session.interface";
 import { SessionService } from "./service/session.service";
-import { FilterCommand } from "./commands/filter.command";
-import { MenuCommand } from "./commands/menu.command";
+import { ICommandManager } from "./handler/commands.interface";
+import { CommandManager } from "./handler/commands.class";
 
 class Bot {
   bot: Telegraf<IBotContext>;
-  commands: Command[] = [];
+  commands: ICommandManager;
   database: IDatabase;
   session: ISessionService;
   
@@ -21,17 +19,12 @@ class Bot {
     this.bot = new Telegraf<IBotContext>(this.configService.get("BOT_TOKEN"));
     this.database = new DatabaseService(this.configService.get("MONGO_URL"));
     this.session = new SessionService();
+    this.commands = new CommandManager(this.bot, this.session);
   }
 
-  start() {
-    this.commands = [
-      new StartCommand(this.bot, this.session), 
-      new FilterCommand(this.bot, this.session), 
-      new MenuCommand(this.bot, this.session)
-    ];
-    for(const command of this.commands) {
-      command.handle();
-    }
+  async start() {
+    await this.commands.load("dist/commands");
+    this.commands.handleCommands();
     this.database.connect();
     this.bot.launch();
     console.log("Bot successfully start");
