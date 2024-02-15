@@ -14,7 +14,7 @@ export class CommandManager implements ICommandManager {
   ) { }
 
   async load(commandsFolderPath: string): Promise<void> {
-    const regex = /\w+\.command\.js$/;
+    const regex = /\w+\.(?!class)\w+\.js$/;
     const files = await fs.promises.readdir(commandsFolderPath);
     if(!files) {
       throw new Error("Cant find command files");
