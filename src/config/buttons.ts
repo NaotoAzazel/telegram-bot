@@ -3,30 +3,44 @@ type ButtonItem = {
   value: string;
 }
 
+type MenuItem = {
+  switchToInline?: ButtonItem[];
+  buttons?: ButtonItem[]; 
+}
+
 type ButtonsConfig = {
-  startMenu: ButtonItem[],
-  mainMenu: ButtonItem[],
-  filterMenu: ButtonItem[]
+  startMenu: MenuItem,
+  mainMenu: MenuItem,
+  filterMenu: MenuItem
 }
 
 export const BUTTONS: ButtonsConfig = {
-  startMenu: [
-    { name: "📃 Открыть меню", value: "menu" }
-  ],
-  mainMenu: [
-    { name: "Фильтр", value: "filter" },
-    { name: "Начать поиск", value: "search" }
-  ],
-  filterMenu: [
-    { name: "Рейтинг от", value: "minRating" },
-    { name: "Рейтинг до", value: "maxRating" },
-    { name: "Год от", value: "startYear" },
-    { name: "Год до", value: "endYear" },
-    { name: "Выбрать тип", value: "type" },
-    { name: "Выбрать жанр", value: "genre" },
-    { name: "Сбросить", value: "reset" },
-    { name: "Искать по фильтру", value: "searchByFilter" },
-    { name: "Назад", value: "menu" }
-  ]
+  startMenu: {
+    buttons: [
+      { name: "📃 Открыть меню", value: "menu" }
+    ]
+  },
+  mainMenu: {
+    buttons: [
+      { name: "Фильтр", value: "filter" },
+      { name: "Начать поиск", value: "search" },
+      { name: "Session", value: "session" }
+    ]
+  },
+  filterMenu: {
+    switchToInline: [
+      { name: "Рейтинг от", value: "filter_minRating" },
+      { name: "Рейтинг до", value: "filter_maxRating" },
+      { name: "Год от", value: "filter_startYear" },
+      { name: "Год до", value: "filter_endYear" },
+      { name: "Выбрать тип", value: "filter_type" },
+      { name: "Выбрать жанр", value: "filter_genre" },
+      { name: "Искать по фильтру", value: "filter" }
+    ],
+    buttons: [
+      { name: "Сбросить", value: "reset" },
+      { name: "Назад", value: "menu" }
+    ]
+  },
 }
 

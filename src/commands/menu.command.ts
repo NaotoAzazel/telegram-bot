@@ -11,9 +11,8 @@ export default class MenuCommand extends Command {
   }
 
   handle(): void {
-    const buttons = BUTTONS.mainMenu.map(button => 
-      Markup.button.callback(button.name, button.value)
-    );
+    const buttons = BUTTONS.mainMenu.buttons ? 
+      BUTTONS.mainMenu.buttons.map(button => Markup.button.callback(button.name, button.value)) : [];
 
     this.bot.action("menu", async(ctx) => {
       const id = String(ctx.from?.id);

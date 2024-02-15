@@ -11,9 +11,8 @@ export default class StartCommand extends Command {
   }
 
   handle(): void {
-    const buttons = BUTTONS.startMenu.map(button => 
-      Markup.button.callback(button.name, button.value)
-    );
+    const buttons = BUTTONS.startMenu.buttons ? 
+      BUTTONS.startMenu.buttons.map(button => Markup.button.callback(button.name, button.value)) : [];
 
     this.bot.start(async(ctx) => {
       const id = String(ctx.from?.id);

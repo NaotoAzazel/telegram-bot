@@ -11,12 +11,34 @@ export default class FilterCommand extends Command {
   }
 
   handle(): void {
-    const buttons = BUTTONS.filterMenu.map(button => 
-      Markup.button.callback(button.name, button.value)  
+    if(!BUTTONS.filterMenu.switchToInline || !BUTTONS.filterMenu.buttons) {
+      throw new Error("Cant find buttons");
+    }
+
+    const inlineButtons = BUTTONS.filterMenu.switchToInline.map(button => 
+      Markup.button.switchToCurrentChat(button.name, button.value)
     );
 
-    this.bot.action("filter", (ctx) => {
-      ctx.editMessageText("Меню фильтров", Markup.inlineKeyboard(buttons, { columns: 2 }));
+    const buttons = BUTTONS.filterMenu.buttons.map(button => 
+      Markup.button.callback(button.name, button.value)
+    );
+
+    const allButtons = [...inlineButtons, ...buttons];
+
+    this.bot.action("filter", async(ctx) => {
+      const userId = String(ctx.from?.id);
+      const session = await this.session?.findById(userId);
+
+      ctx.editMessageText(
+        "Меню фильтров\n\n" +
+        "Выбери фильтры и жми \"Искать по фильтру\`\n\n" +
+        "Выбрано:\n" +
+        `📈 Рейтинг: ${session?.minRating} - ${session?.maxRating}\n` +
+        `📅 Начиная с года: ${session?.startYear}\n` +
+        `📆 До года: ${session?.endYear}\n` +
+        `🎵 Жанр: ${session?.genre || "Все"}\n` +
+        `🔀 Тип: ${session?.type || "Все"}\n`
+      , Markup.inlineKeyboard(allButtons, { columns: 2 }));
     });
   }
 }
