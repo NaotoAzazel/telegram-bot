@@ -5,7 +5,7 @@ import { ISessionService } from "../service/session.interface";
 export abstract class Command {
   constructor(
     public bot: Telegraf<IBotContext>, 
-    public session?: ISessionService
+    public session: ISessionService
   ) {}
 
   async checkUserSession(id: string): Promise<void> {

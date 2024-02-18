@@ -3,11 +3,11 @@ import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
 import { BUTTONS } from "../config/buttons";
+import Menu from "../config/menu.class";
 
 export default class StartCommand extends Command {
   constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
-    super(bot);
-    this.session = session;
+    super(bot, session);
   }
 
   handle(): void {
@@ -18,7 +18,12 @@ export default class StartCommand extends Command {
       const id = String(ctx.from?.id);
       this.checkUserSession(id);
 
-      ctx.reply("Для начала роботы с ботом нажмите ниже", Markup.inlineKeyboard(buttons));
+      const startMenuText = Menu.createStartMenuText();
+      const replyMessage = await ctx.reply(startMenuText, Markup.inlineKeyboard(buttons));
+      this.session.setMainMessage({
+        messageId: replyMessage.message_id, 
+        chatId: replyMessage.chat.id 
+      });
     });
   }
 }
