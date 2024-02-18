@@ -41,7 +41,7 @@ export class SessionService implements ISessionService {
     this.lastMessageId = messageId;
   }
 
-  getLastMessageId() {
+  getLastMessageId(): number {
     return this.lastMessageId;
   }
 
