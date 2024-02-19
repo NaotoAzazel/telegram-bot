@@ -1,4 +1,5 @@
 import { SessionData } from "../context/context.interface";
+import { GENRES, TYPES, KeyValueItem } from "./genresAndTypes.constants";
 
 export default new class Menu {
   createStartMenuText(): string {
@@ -20,15 +21,27 @@ export default new class Menu {
   }
 
   createFilterMenuText(session: SessionData): string {
+    const findKeyByValue = (object: KeyValueItem, value: string | number) => {
+      return Object.keys(object).find(key => object[key] === value);
+    };
+
+    const genre = session.genre 
+      ? findKeyByValue(GENRES, session.genre)
+      : "Все";
+
+    const type = session.type
+      ? findKeyByValue(TYPES, session.type)
+      : "Все";
+
     return (
       "Меню фильтров\n\n" +
       "Выбери фильтры и жми \"Искать по фильтру\`\n\n" +
       "Выбрано:\n" +
-      `📈 Рейтинг: ${session?.minRating} - ${session?.maxRating}\n` +
-      `📅 Начиная с года: ${session?.startYear}\n` +
-      `📆 До года: ${session?.endYear}\n` +
-      `🎵 Жанр: ${session?.genre || "Все"}\n` +
-      `🔀 Тип: ${session?.type || "Все"}\n`
+      `📈 Рейтинг: ${session.minRating} - ${session?.maxRating}\n` +
+      `📅 Начиная с года: ${session.startYear}\n` +
+      `📆 До года: ${session.endYear}\n` +
+      `🎵 Жанр: ${genre}\n` +
+      `🔀 Тип: ${type}\n`
     );
   }
 
