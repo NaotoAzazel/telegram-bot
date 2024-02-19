@@ -24,7 +24,6 @@ export const BUTTONS: ButtonsConfig = {
     buttons: [
       { name: "Фильтр", value: "filter" },
       { name: "Начать поиск", value: "search" },
-      { name: "Session", value: "session" }
     ]
   },
   filterMenu: {
