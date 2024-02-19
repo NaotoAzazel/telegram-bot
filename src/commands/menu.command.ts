@@ -15,7 +15,7 @@ export default class MenuCommand extends Command {
       BUTTONS.mainMenu.buttons.map(button => Markup.button.callback(button.name, button.value)) : [];
 
     this.bot.action("menu", async(ctx) => {
-      const userId = String(ctx.from?.id);
+      const userId = ctx.from!.id;
       const session = await this.session.findById(userId);
       if(!session) {
         throw new Error("Session not found");

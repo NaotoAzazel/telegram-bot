@@ -11,7 +11,7 @@ export class SessionService implements ISessionService {
   private lastMessageId: number = -1;
   private mainMessage: MainMessage = { messageId: -1, chatId: -1 };
 
-  async create(id: string): Promise<void> {
+  async create(id: number): Promise<void> {
     try {
       await SessionModel.create({ id });
     } catch(err) {
@@ -19,7 +19,7 @@ export class SessionService implements ISessionService {
     }
   }
 
-  async findById(id: string): Promise<SessionData | null> {
+  async findById(id: number): Promise<SessionData | null> {
     try {
       const session = await SessionModel.findOne({ id });
       return session;
@@ -28,7 +28,7 @@ export class SessionService implements ISessionService {
     }
   }
 
-  async updateById(field: string, value: string, id: string) {
+  async updateById(field: keyof SessionData, value: string | number, id: number): Promise<void> {
     try {
       const update = { [field]: value };
       await SessionModel.findOneAndUpdate({ id }, update, { new: true });

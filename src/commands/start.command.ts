@@ -15,7 +15,7 @@ export default class StartCommand extends Command {
       BUTTONS.startMenu.buttons.map(button => Markup.button.callback(button.name, button.value)) : [];
 
     this.bot.start(async(ctx) => {
-      const id = String(ctx.from?.id);
+      const id = ctx.from.id;
       this.checkUserSession(id);
 
       const startMenuText = Menu.createStartMenuText();

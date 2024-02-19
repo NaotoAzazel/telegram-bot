@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { SessionData } from "../context/context.interface";
 
 const SessionModel = new Schema<SessionData>({
-  id: { type: String, required: true },
+  id: { type: Number, required: true },
   startYear: { type: String, default: "1975" },
   endYear: { type: String, default: "2020" },
   minRating: { type: String, default: "5" },

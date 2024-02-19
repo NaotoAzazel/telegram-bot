@@ -8,7 +8,7 @@ export abstract class Command {
     public session: ISessionService
   ) {}
 
-  async checkUserSession(id: string): Promise<void> {
+  async checkUserSession(id: number): Promise<void> {
     if(this.session) {
       const userSession = await this.session.findById(id);
       if(!userSession) {
