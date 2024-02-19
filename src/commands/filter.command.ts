@@ -24,14 +24,22 @@ export default class FilterCommand extends Command {
     );
 
     this.bot.action("filter", async(ctx) => {
-      const userId = String(ctx.from?.id);
+      const userId = ctx.from!.id;
       const session = await this.session.findById(userId);
       if(!session) {
         throw new Error("Session not found");
       }
 
+      const mainMessage = this.session.getMainMessage();
       const filterMenuText = Menu.createFilterMenuText(session);
-      ctx.editMessageText(filterMenuText, Markup.inlineKeyboard([...inlineButtons, ...buttons], { columns: 2 }));
+      
+      await ctx.telegram.editMessageText(
+        mainMessage.chatId, mainMessage.messageId, undefined, filterMenuText
+      );
+
+      await ctx.telegram.editMessageReplyMarkup(mainMessage.chatId, mainMessage.messageId, undefined,
+        Markup.inlineKeyboard([...inlineButtons, ...buttons], { columns: 2 }).reply_markup
+      )
     });
   }
 }
