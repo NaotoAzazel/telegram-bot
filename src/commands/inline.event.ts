@@ -35,31 +35,29 @@ export default class InlineEvent extends Command {
 
       switch(filterType) {
         case "minRating": {
-          if(Number(choseResult.result_id) > Number(session.maxRating)) {
-            await this.session.updateById("maxRating", choseResult.result_id, userId);
+          if(Number(choseResult.result_id) > session.maxRating) {
+            await this.session.updateById({ maxRating: choseResult.result_id }, userId);
           }
-          
-          await this.session.updateById(filterType, choseResult.result_id, userId);
           break;
         }
 
         case "maxRating": {
-          if(Number(choseResult.result_id) < Number(session.minRating)) {
-            await this.session.updateById("minRating", choseResult.result_id, userId);
+          if(Number(choseResult.result_id) < session.minRating) {
+            await this.session.updateById({ minRating: choseResult.result_id }, userId);
           }
           break;
         }
 
         case "startYear": {
-          if(Number(choseResult.result_id) > Number(session.endYear)) {
-            await this.session.updateById("endYear", choseResult.result_id, userId);
+          if(Number(choseResult.result_id) > session.endYear) {
+            await this.session.updateById({ endYear: choseResult.result_id }, userId);
           }
           break;
         }
 
         case "endYear": {
           if(Number(choseResult.result_id) < Number(session.startYear)) {
-            await this.session.updateById("startYear", choseResult.result_id, userId);
+            await this.session.updateById({ startYear: choseResult.result_id }, userId);
           }
           break;
         }
@@ -67,13 +65,13 @@ export default class InlineEvent extends Command {
         case "genre": {
           if(choseResult.result_id === "All") {
             choseResult.result_id = "";
-            break;
           }
+          break;
         }
       }
 
-      await this.session.updateById(filterType as keyof SessionData, choseResult.result_id, userId);
-
+      await this.session.updateById({ [filterType as keyof SessionData]: choseResult.result_id }, userId);
+      
       const uniqueNumber: number = new Date().getTime();
       this.bot.handleUpdate({
         update_id: uniqueNumber,

@@ -1,6 +1,6 @@
 import { SessionData } from "../context/context.interface";
-import SessionModel from "../schema/session";
-import { ISessionService } from "./session.interface";
+import SessionModel from "../schema/session.schema";
+import { ISessionService, UpdateFields } from "./session.interface";
 
 export type MainMessage = {
   messageId: number;
@@ -28,10 +28,9 @@ export class SessionService implements ISessionService {
     }
   }
 
-  async updateById(field: keyof SessionData, value: string | number, id: number): Promise<void> {
+  async updateById(fields: UpdateFields, id: number): Promise<void> {
     try {
-      const update = { [field]: value };
-      await SessionModel.findOneAndUpdate({ id }, update, { new: true });
+      await SessionModel.findOneAndUpdate({ id }, fields, { new: true });
     } catch(err) {
       throw new Error(err as string);
     }

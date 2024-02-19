@@ -1,7 +1,7 @@
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
 import Menu from "./config/menu.class";
 import { ISessionService } from "./service/session.interface";
-import { KeyValueItem } from "./config/genres";
+import { KeyValueItem } from "./config/genresAndTypes.constants";
 
 export async function generateNumberInlineQuery(
   start: number,
@@ -20,8 +20,8 @@ export async function generateNumberInlineQuery(
   const mainMessage = session.getMainMessage();
 
   for(let i = start; i <= end; i += step) {
-    const formattedId = Number.isInteger(i) ? i.toString() : i.toFixed(1);
-    const formattedTitle = Number(currentSession[type]) === Number(formattedId)
+    const formattedId = i.toFixed(1);
+    const formattedTitle = currentSession[type].toFixed(1) === i.toFixed(1)
       ? `(Выбрано) ${formattedId}`
       : formattedId;
 

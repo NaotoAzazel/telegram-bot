@@ -2,12 +2,12 @@ import { Context } from "telegraf";
 
 export interface SessionData {
   id: number;
-  startYear?: string;
-  endYear?: string;
-  minRating?: string;
-  maxRating?: string;
-  genre?: string;
-  type?: string;
+  startYear: number;
+  endYear: number;
+  minRating: number;
+  maxRating: number;
+  genre: string;
+  type: string;
   createdAt: Date;
 }
 
