@@ -1,7 +1,7 @@
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
 import Menu from "./config/menu.class";
 import { ISessionService } from "./service/session.interface";
-import { KeyValueItem } from "./config/genresAndTypes.constants";
+import { KeyValueItem } from "./config/ui-config.constants";
 
 export async function generateNumberInlineQuery(
   start: number,

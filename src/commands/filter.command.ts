@@ -2,9 +2,9 @@ import { Markup, Telegraf } from "telegraf";
 import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
-import { BUTTONS } from "../config/buttons";
-import Menu from "../config/menu.class";
 import { DEFAULT_VALUES, DefaultValues } from "../schema/session.schema";
+import { BUTTONS, ButtonItem } from "../config/ui-config.constants";
+import Menu from "../config/menu.class";
 
 export default class FilterCommand extends Command {
   constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
@@ -12,18 +12,6 @@ export default class FilterCommand extends Command {
   }
 
   handle(): void {
-    if(!BUTTONS.filterMenu.switchToInline || !BUTTONS.filterMenu.buttons) {
-      throw new Error("Cant find buttons");
-    }
-
-    const inlineButtons = BUTTONS.filterMenu.switchToInline.map(button => 
-      Markup.button.switchToCurrentChat(button.name, button.value)
-    );
-
-    const buttons = BUTTONS.filterMenu.buttons.map(button => 
-      Markup.button.callback(button.name, button.value)
-    );
-
     this.bot.action("reset", async(ctx) => {
       const preventDefault: DefaultValues = {
         startYear: DEFAULT_VALUES["startYear"],
@@ -40,14 +28,20 @@ export default class FilterCommand extends Command {
 
     this.bot.action("filter", async(ctx) => {
       const userId = ctx.from!.id;
+      const mainMessage = this.session.getMainMessage();
       const session = await this.session.findById(userId);
       if(!session) {
         throw new Error("Session not found");
       }
 
-      const mainMessage = this.session.getMainMessage();
+      const buttons = (BUTTONS.filterMenu.buttons as ButtonItem[]).map(button => 
+        Markup.button.callback(button.name, button.value)
+      );
+      const inlineButtons = (BUTTONS.filterMenu.switchToInline as ButtonItem[]).map(button => 
+        Markup.button.switchToCurrentChat(button.name, button.value)
+      );
+
       const filterMenuText = Menu.createFilterMenuText(session);
-      
       await ctx.telegram.editMessageText(
         mainMessage.chatId, mainMessage.messageId, undefined, filterMenuText
       );

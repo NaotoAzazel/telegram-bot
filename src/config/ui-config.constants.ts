@@ -1,9 +1,13 @@
-type ButtonItem = {
+export type KeyValueItem = {
+  [key: string]: string;
+}
+
+export type ButtonItem = {
   name: string;
   value: string;
 }
 
-type MenuItem = {
+export type MenuItem = {
   switchToInline?: ButtonItem[];
   buttons?: ButtonItem[]; 
 }
@@ -14,16 +18,40 @@ type ButtonsConfig = {
   filterMenu: MenuItem
 }
 
+export const GENRES: KeyValueItem = {
+  "Все": "All",
+  "Экшен": "Action",
+  "Комедия": "Comedy",
+  "Триллер": "Thriller",
+  "Приключения": "Adventure",
+  "Анимация": "Animation",
+  "Научная фантастика": "Sci-fi",
+  "Ужасы": "Horror",
+  "Драма": "Drama",
+  "История": "History",
+  "Мистика": "Mystery",
+  "Спорт": "Sport",
+  "Фэнтези": "Fantasy",
+  "Семейный": "Family",
+  "Криминал": "Crime"
+};
+
+export const TYPES: KeyValueItem = {
+  "Фильм": "movie"
+};
+
 export const BUTTONS: ButtonsConfig = {
   startMenu: {
     buttons: [
       { name: "📃 Открыть меню", value: "menu" }
-    ]
+    ],
   },
   mainMenu: {
     buttons: [
       { name: "Фильтр", value: "filter" },
-      { name: "Начать поиск", value: "search" },
+    ],
+    switchToInline: [
+      { name: "Начать поиск", value: "" },
     ]
   },
   filterMenu: {
@@ -42,4 +70,3 @@ export const BUTTONS: ButtonsConfig = {
     ]
   },
 }
-

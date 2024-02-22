@@ -2,7 +2,7 @@ import { Markup, Telegraf } from "telegraf";
 import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
-import { BUTTONS } from "../config/buttons";
+import { BUTTONS, ButtonItem } from "../config/ui-config.constants";
 import Menu from "../config/menu.class";
 
 export default class MenuCommand extends Command {
@@ -11,9 +11,6 @@ export default class MenuCommand extends Command {
   }
 
   handle(): void {
-    const buttons = BUTTONS.mainMenu.buttons ? 
-      BUTTONS.mainMenu.buttons.map(button => Markup.button.callback(button.name, button.value)) : [];
-
     this.bot.action("menu", async(ctx) => {
       const userId = ctx.from!.id;
       const session = await this.session.findById(userId);
@@ -21,8 +18,15 @@ export default class MenuCommand extends Command {
         throw new Error("Session not found");
       }
 
+      const buttons = (BUTTONS.mainMenu.buttons as ButtonItem[]).map(button => 
+        Markup.button.callback(button.name, button.value)
+      );
+      const inlineButtons = (BUTTONS.mainMenu.switchToInline as ButtonItem[]).map(button => 
+        Markup.button.switchToCurrentChat(button.name, button.value)
+      );
       const mainMenuText = Menu.createMainMenuText(session);
-      ctx.editMessageText(mainMenuText,  Markup.inlineKeyboard(buttons))
+
+      ctx.editMessageText(mainMenuText, Markup.inlineKeyboard([...buttons, ...inlineButtons]))
     })
   }
 }

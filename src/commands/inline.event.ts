@@ -4,7 +4,7 @@ import { IBotContext, SessionData } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
 import { generateNumberInlineQuery, generateTextInlineQuery } from "../utils";
-import { GENRES, TYPES } from "../config/genresAndTypes.constants";
+import { GENRES, TYPES } from "../config/ui-config.constants";
 import Menu from "../config/menu.class";
 
 export default class InlineEvent extends Command {

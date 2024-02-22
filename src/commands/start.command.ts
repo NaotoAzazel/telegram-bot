@@ -2,7 +2,7 @@ import { Markup, Telegraf } from "telegraf";
 import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
-import { BUTTONS } from "../config/buttons";
+import { BUTTONS, ButtonItem } from "../config/ui-config.constants";
 import Menu from "../config/menu.class";
 
 export default class StartCommand extends Command {
@@ -11,11 +11,12 @@ export default class StartCommand extends Command {
   }
 
   handle(): void {
-    const buttons = BUTTONS.startMenu.buttons ? 
-      BUTTONS.startMenu.buttons.map(button => Markup.button.callback(button.name, button.value)) : [];
-
     this.bot.start(async(ctx) => {
       const id = ctx.from.id;
+      const buttons = (BUTTONS.startMenu.buttons as ButtonItem[]).map(button => 
+        Markup.button.callback(button.name, button.value)
+      );
+
       this.checkUserSession(id);
 
       const startMenuText = Menu.createStartMenuText();
