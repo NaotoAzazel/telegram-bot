@@ -11,23 +11,20 @@ export default class ButtonEvent extends Command {
 
   handle(): void {
     this.bot.on("callback_query", async(ctx, next) => {
-      const mainMessage = this.session.getMainMessage();
+      const mainMessage = this.session?.getMainMessage();
       const callbackQuery = ctx.callbackQuery;
       const errorMenuText = Menu.createErrorMenu();
 
-      if (
-        (callbackQuery && mainMessage!.messageId < 0) ||
-        (callbackQuery.message?.message_id !== mainMessage.messageId)
-      ) {
+      if(callbackQuery && mainMessage!.messageId < 0) {
         ctx.telegram.editMessageText(
-          callbackQuery.message?.chat.id,
+          callbackQuery.message?.chat.id, 
           callbackQuery.message?.message_id,
           undefined,
           errorMenuText
-        );
+        )
+
         return false;
       }
-      
       next();
     });
   }
