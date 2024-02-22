@@ -10,7 +10,7 @@ export type DefaultValues = {
   type: string;
 }
 
-const DEFAULT_VALUES: DefaultValues = {
+export const DEFAULT_VALUES: DefaultValues = {
   startYear: 1975,
   endYear: 2020,
   minRating: 1,

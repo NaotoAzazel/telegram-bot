@@ -1,4 +1,5 @@
-import { SessionData } from "../context/context.interface";
+import { Telegraf } from "telegraf";
+import { IBotContext, SessionData } from "../context/context.interface";
 import { GENRES, TYPES, KeyValueItem } from "./genresAndTypes.constants";
 
 export default new class Menu {
@@ -47,5 +48,23 @@ export default new class Menu {
 
   createErrorMenu(): string {
     return "Это сообщение больше не доступно для взимодействия с ним, отправьте команду /start для начала роботы."
+  }
+
+  updateMenuText(bot: Telegraf<IBotContext>, userId: number, data: "menu" | "filter"): void {
+    const uniqueNumber: number = new Date().getTime();
+    bot.handleUpdate({
+      update_id: uniqueNumber,
+      callback_query: {
+        id: uniqueNumber.toString(),
+        from: { 
+          id: userId, 
+          is_bot: false, 
+          first_name: uniqueNumber.toString()
+        }, 
+        message: undefined,
+        chat_instance: uniqueNumber.toString(),
+        data
+      }
+    });
   }
 }

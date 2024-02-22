@@ -5,6 +5,7 @@ import { ISessionService } from "../service/session.interface";
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
 import { generateNumberInlineQuery, generateTextInlineQuery } from "../utils";
 import { GENRES, TYPES } from "../config/genresAndTypes.constants";
+import Menu from "../config/menu.class";
 
 export default class InlineEvent extends Command {
   constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
@@ -25,70 +26,52 @@ export default class InlineEvent extends Command {
 
       if(mainMessage.messageId < 0) return;
 
-      let session = await this.session.findById(userId);
+      const session = await this.session.findById(userId);
       if(!session) {
         throw new Error("Session not found")
       }
 
       const filterType = chosenResult.query.slice(7);
-      const choseResult = ctx.chosenInlineResult;
-
       switch(filterType) {
         case "minRating": {
-          if(Number(choseResult.result_id) > session.maxRating) {
-            await this.session.updateById({ maxRating: choseResult.result_id }, userId);
+          if(Number(chosenResult.result_id) > session.maxRating) {
+            await this.session.updateById({ maxRating: chosenResult.result_id }, userId);
           }
           break;
         }
 
         case "maxRating": {
-          if(Number(choseResult.result_id) < session.minRating) {
-            await this.session.updateById({ minRating: choseResult.result_id }, userId);
+          if(Number(chosenResult.result_id) < session.minRating) {
+            await this.session.updateById({ minRating: chosenResult.result_id }, userId);
           }
           break;
         }
 
         case "startYear": {
-          if(Number(choseResult.result_id) > session.endYear) {
-            await this.session.updateById({ endYear: choseResult.result_id }, userId);
+          if(Number(chosenResult.result_id) > session.endYear) {
+            await this.session.updateById({ endYear: chosenResult.result_id }, userId);
           }
           break;
         }
 
         case "endYear": {
-          if(Number(choseResult.result_id) < Number(session.startYear)) {
-            await this.session.updateById({ startYear: choseResult.result_id }, userId);
+          if(Number(chosenResult.result_id) < Number(session.startYear)) {
+            await this.session.updateById({ startYear: chosenResult.result_id }, userId);
           }
           break;
         }
 
         case "genre": {
-          if(choseResult.result_id === "All") {
-            choseResult.result_id = "";
+          if(chosenResult.result_id === "All") {
+            chosenResult.result_id = "";
           }
           break;
         }
       }
-
-      await this.session.updateById({ [filterType as keyof SessionData]: choseResult.result_id }, userId);
+      await this.session.updateById({ [filterType as keyof SessionData]: chosenResult.result_id }, userId);
+      Menu.updateMenuText(this.bot, ctx.from!.id, "filter");
       
-      const uniqueNumber: number = new Date().getTime();
-      this.bot.handleUpdate({
-        update_id: uniqueNumber,
-        callback_query: {
-          id: uniqueNumber.toString(),
-          from: { 
-            id: userId, 
-            is_bot: false, 
-            first_name: "firtsName" 
-          }, 
-          message: undefined,
-          chat_instance: uniqueNumber.toString(),
-          data: "filter"
-        }
-      });
-      
-      if(lastMessageId) { // fix when deleting message that contain error message
+      if(lastMessageId) {
         ctx.telegram.deleteMessage(ctx.from.id, lastMessageId);
       }
     })
