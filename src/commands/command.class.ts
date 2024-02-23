@@ -10,14 +10,5 @@ export abstract class Command {
     public database: IDatabase
   ) {}
 
-  async checkUserSession(id: number): Promise<void> {
-    if(this.session) {
-      const userSession = await this.database.findById(id);
-      if(!userSession) {
-        await this.database?.create(id);
-      }
-    }
-  }
-
   abstract handle(): void;
 }

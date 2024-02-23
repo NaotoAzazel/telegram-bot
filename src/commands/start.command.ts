@@ -18,7 +18,10 @@ export default class StartCommand extends Command {
         Markup.button.callback(button.name, button.value)
       );
 
-      this.checkUserSession(id);
+      const userSession = await this.database.findById(id);
+      if(!userSession) {
+        await this.database.create(id);
+      }
 
       const startMenuText = Menu.createStartMenuText();
       const replyMessage = await ctx.reply(startMenuText, Markup.inlineKeyboard(buttons));
