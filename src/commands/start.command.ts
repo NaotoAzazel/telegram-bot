@@ -4,10 +4,11 @@ import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
 import { BUTTONS, ButtonItem } from "../config/ui-config.constants";
 import Menu from "../config/menu.class";
+import { IDatabase } from "../service/database.interface";
 
 export default class StartCommand extends Command {
-  constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
-    super(bot, session);
+  constructor(bot: Telegraf<IBotContext>, session: ISessionService, database: IDatabase) { 
+    super(bot, session, database);
   }
 
   handle(): void {

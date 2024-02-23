@@ -19,7 +19,7 @@ class Bot {
     this.bot = new Telegraf<IBotContext>(this.configService.get("BOT_TOKEN"));
     this.database = new DatabaseService(this.configService.get("MONGO_URL"));
     this.session = new SessionService();
-    this.commands = new CommandManager(this.bot, this.session);
+    this.commands = new CommandManager(this.bot, this.session, this.database);
   }
 
   async start() {

@@ -4,13 +4,15 @@ import { Telegraf } from "telegraf";
 import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
 import { ICommandManager } from "./commands.interface";
+import { IDatabase } from "../service/database.interface";
 
 export class CommandManager implements ICommandManager {
   private commands: Command[] = [];
 
   constructor(
     private bot: Telegraf<IBotContext>, 
-    private session: ISessionService
+    private session: ISessionService,
+    private database: IDatabase
   ) { }
 
   async load(commandsFolderPath: string): Promise<void> {
@@ -23,7 +25,7 @@ export class CommandManager implements ICommandManager {
     const sortedFiles = files.filter((file) => regex.test(file));
     for(const file of sortedFiles) {
       const { default: CommandClass } = await import(`../../${commandsFolderPath}/${file}`);
-      const commandInstance = new CommandClass(this.bot, this.session);
+      const commandInstance = new CommandClass(this.bot, this.session, this.database);
 
       this.commands.push(commandInstance);
     }

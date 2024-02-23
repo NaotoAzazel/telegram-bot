@@ -5,10 +5,11 @@ import { ISessionService } from "../service/session.interface";
 import { DEFAULT_VALUES, DefaultValues } from "../schema/session.schema";
 import { BUTTONS, ButtonItem } from "../config/ui-config.constants";
 import Menu from "../config/menu.class";
+import { IDatabase } from "../service/database.interface";
 
 export default class FilterCommand extends Command {
-  constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
-    super(bot, session);
+  constructor(bot: Telegraf<IBotContext>, session: ISessionService, database: IDatabase) { 
+    super(bot, session, database);
   }
 
   handle(): void {
@@ -22,14 +23,14 @@ export default class FilterCommand extends Command {
         type: DEFAULT_VALUES["type"]
       };
 
-      await this.session.updateById(preventDefault, ctx.from!.id);
+      await this.database?.updateById(preventDefault, ctx.from!.id);
       Menu.updateMenuText(this.bot, ctx.from!.id, "filter");
     })
 
     this.bot.action("filter", async(ctx) => {
       const userId = ctx.from!.id;
-      const mainMessage = this.session.getMainMessage();
-      const session = await this.session.findById(userId);
+      const mainMessage = this.session?.getMainMessage();
+      const session = await this.database?.findById(userId);
       if(!session) {
         throw new Error("Session not found");
       }
@@ -43,10 +44,10 @@ export default class FilterCommand extends Command {
 
       const filterMenuText = Menu.createFilterMenuText(session);
       await ctx.telegram.editMessageText(
-        mainMessage.chatId, mainMessage.messageId, undefined, filterMenuText
+        mainMessage?.chatId, mainMessage?.messageId, undefined, filterMenuText
       );
 
-      await ctx.telegram.editMessageReplyMarkup(mainMessage.chatId, mainMessage.messageId, undefined,
+      await ctx.telegram.editMessageReplyMarkup(mainMessage?.chatId, mainMessage?.messageId, undefined,
         Markup.inlineKeyboard([...inlineButtons, ...buttons], { columns: 2 }).reply_markup
       )
     });

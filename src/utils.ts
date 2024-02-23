@@ -2,6 +2,7 @@ import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
 import Menu from "./config/menu.class";
 import { ISessionService } from "./service/session.interface";
 import { KeyValueItem } from "./config/ui-config.constants";
+import { IDatabase } from "./service/database.interface";
 
 export async function generateNumberInlineQuery(
   start: number,
@@ -9,10 +10,11 @@ export async function generateNumberInlineQuery(
   step: number,
   userId: number,
   type: "minRating" | "maxRating" | "startYear" | "endYear",
+  database: IDatabase,
   session: ISessionService
 ): Promise<InlineQueryResultArticle[]> {
   const result: InlineQueryResultArticle[] = [];
-  const currentSession = await session.findById(userId);
+  const currentSession = await database.findById(userId);
   if (!currentSession) {
     throw new Error("Session not found");
   }
@@ -46,10 +48,11 @@ export async function generateTextInlineQuery(
   userId: number,
   type: "genre" | "type",
   object: KeyValueItem,
+  database: IDatabase,
   session: ISessionService
 ): Promise<InlineQueryResultArticle[]> {
   const result: InlineQueryResultArticle[] = [];
-  const currentSession = await session.findById(userId);
+  const currentSession = await database.findById(userId);
   if (!currentSession) {
     throw new Error("Session not found");
   }

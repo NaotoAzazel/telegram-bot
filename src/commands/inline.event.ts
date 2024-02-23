@@ -6,15 +6,16 @@ import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
 import { generateNumberInlineQuery, generateTextInlineQuery } from "../utils";
 import { GENRES, TYPES } from "../config/ui-config.constants";
 import Menu from "../config/menu.class";
+import { IDatabase } from "../service/database.interface";
 
 export default class InlineEvent extends Command {
-  constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
-    super(bot, session);
+  constructor(bot: Telegraf<IBotContext>, session: ISessionService, database: IDatabase) { 
+    super(bot, session, database);
   }
 
   handle(): void {
     this.bot.on("message", (ctx, next) => {
-      this.session?.setLastMessageId(ctx.message.message_id);
+      this.session.setLastMessageId(ctx.message.message_id);
       next();
     });
 
@@ -26,7 +27,7 @@ export default class InlineEvent extends Command {
 
       if(mainMessage.messageId < 0) return;
 
-      const session = await this.session.findById(userId);
+      const session = await this.database.findById(userId);
       if(!session) {
         throw new Error("Session not found")
       }
@@ -35,28 +36,28 @@ export default class InlineEvent extends Command {
       switch(filterType) {
         case "minRating": {
           if(Number(chosenResult.result_id) > session.maxRating) {
-            await this.session.updateById({ maxRating: chosenResult.result_id }, userId);
+            await this.database.updateById({ maxRating: chosenResult.result_id }, userId);
           }
           break;
         }
 
         case "maxRating": {
           if(Number(chosenResult.result_id) < session.minRating) {
-            await this.session.updateById({ minRating: chosenResult.result_id }, userId);
+            await this.database.updateById({ minRating: chosenResult.result_id }, userId);
           }
           break;
         }
 
         case "startYear": {
           if(Number(chosenResult.result_id) > session.endYear) {
-            await this.session.updateById({ endYear: chosenResult.result_id }, userId);
+            await this.database.updateById({ endYear: chosenResult.result_id }, userId);
           }
           break;
         }
 
         case "endYear": {
           if(Number(chosenResult.result_id) < Number(session.startYear)) {
-            await this.session.updateById({ startYear: chosenResult.result_id }, userId);
+            await this.database.updateById({ startYear: chosenResult.result_id }, userId);
           }
           break;
         }
@@ -68,7 +69,7 @@ export default class InlineEvent extends Command {
           break;
         }
       }
-      await this.session.updateById({ [filterType as keyof SessionData]: chosenResult.result_id }, userId);
+      await this.database.updateById({ [filterType as keyof SessionData]: chosenResult.result_id }, userId);
       Menu.updateMenuText(this.bot, ctx.from!.id, "filter");
       
       if(lastMessageId) {
@@ -84,20 +85,24 @@ export default class InlineEvent extends Command {
       switch(filterType) {
         case "minRating":
         case "maxRating": {
-          results = await generateNumberInlineQuery(0.2, 10, 0.2, userId, filterType, this.session);
+          results 
+            = await generateNumberInlineQuery(0.2, 10, 0.2, userId, filterType, this.database, this.session);
           break;
         } 
 
         case "startYear":
         case "endYear": {
-          results = await generateNumberInlineQuery(1975, 2020, 1, userId, filterType, this.session);
+          results 
+            = await generateNumberInlineQuery(1975, 2020, 1, userId, filterType, this.database, this.session);
           break;
         }
 
         case "genre":
         case "type": {
           results = 
-            await generateTextInlineQuery(userId, filterType, filterType === "genre" ? GENRES : TYPES, this.session);
+            await generateTextInlineQuery(
+              userId, filterType, filterType === "genre" ? GENRES : TYPES, this.database, this.session
+            );
           break;
         }
       }
