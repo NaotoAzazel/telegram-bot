@@ -22,10 +22,27 @@ export async function generateNumberInlineQuery(
   const mainMessage = session.getMainMessage();
 
   for(let i = start; i <= end; i += step) {
-    const formattedId = i.toFixed(1);
-    const formattedTitle = currentSession[type].toFixed(1) === i.toFixed(1)
-      ? `(Выбрано) ${formattedId}`
-      : formattedId;
+    let formattedId: number | string = i;
+    let formattedTitle: string;
+
+    switch(type) {
+      case "startYear":
+      case "endYear": {
+        formattedTitle = currentSession[type] === formattedId
+          ? `(Выбрано) ${formattedId}`
+          : `${formattedId}`;
+        break;
+      }
+
+      case "maxRating":
+      case "minRating": {
+        formattedId = formattedId.toFixed(1);
+        formattedTitle = currentSession[type].toFixed(1) === formattedId
+          ? `(Выбрано) ${formattedId}`
+          : `${formattedId}`;
+        break;
+      }
+    }
 
     const messageText = mainMessage.messageId < 0 
       ? Menu.createErrorMenu()
@@ -33,7 +50,7 @@ export async function generateNumberInlineQuery(
 
     result.push({
       type: "article",
-      id: formattedId,
+      id: formattedId.toString(),
       title: formattedTitle,
       input_message_content: {
         message_text: messageText,

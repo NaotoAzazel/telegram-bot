@@ -107,7 +107,7 @@ export default class InlineEvent extends Command {
         }
       }
       
-      ctx.answerInlineQuery(results);
+      ctx.answerInlineQuery(results, { cache_time: 1 });
     })
   }
 }
