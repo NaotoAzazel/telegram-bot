@@ -4,12 +4,6 @@ import SessionModel from "../schema/session.schema";
 import { SessionData } from "../context/context.interface";
 
 export class DatabaseService implements IDatabase {
-  private connectUrl: string;
-  
-  constructor(connectUrl: string) {
-    this.connectUrl = connectUrl;
-  }
-
   async create(id: number): Promise<void> {
     try {
       await SessionModel.create({ id });
@@ -35,8 +29,8 @@ export class DatabaseService implements IDatabase {
     }
   }
 
-  async connect(): Promise<void> {
-    await mongoose.connect(this.connectUrl)
+  async connect(connectUrl: string): Promise<void> {
+    await mongoose.connect(connectUrl)
       .then(() => console.log("Successfully connected to database"))
       .catch(() => {
         throw new Error("Failed to connect to the database");

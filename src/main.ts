@@ -17,7 +17,7 @@ class Bot {
   
   constructor(private readonly configService: IConfigService) {
     this.bot = new Telegraf<IBotContext>(this.configService.get("BOT_TOKEN"));
-    this.database = new DatabaseService(this.configService.get("MONGO_URL"));
+    this.database = new DatabaseService();
     this.session = new SessionService();
     this.commands = new CommandManager(this.bot, this.session, this.database);
   }
@@ -25,7 +25,7 @@ class Bot {
   async start() {
     await this.commands.load("dist/commands");
     this.commands.handleCommands();
-    this.database.connect();
+    this.database.connect(this.configService.get("MONGO_URL"));
     this.bot.launch();
     console.log("Bot successfully start");
   }

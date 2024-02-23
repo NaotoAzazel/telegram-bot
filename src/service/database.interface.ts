@@ -7,5 +7,5 @@ export interface IDatabase {
   create(id: number): Promise<void>;
   findById(id: number): Promise<SessionData | null>;
   updateById(fields: UpdateFields, id: number): Promise<void>;
-  connect(): void;
+  connect(connectUrl: string): void;
 }
