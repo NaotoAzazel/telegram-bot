@@ -3,7 +3,7 @@ import { Command } from "./command.class";
 import { IBotContext, SessionData } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
-import { generateNumberInlineQuery, generateTextInlineQuery, generateMovieInlineQuery } from "../utils";
+import { generateNumberInlineQuery, generateTextInlineQuery, generateMovieInlineQuery } from "../libs/utils";
 import { GENRES, TYPES } from "../config/ui-config.constants";
 import Menu from "../config/menu.class";
 import { IDatabase } from "../service/database.interface";

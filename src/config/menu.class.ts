@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { IBotContext, SessionData } from "../context/context.interface";
 import { GENRES, TYPES } from "./ui-config.constants";
-import { findKeyByValue } from "../utils";
+import { findKeyByValue } from "../libs/utils";
 
 export default new class Menu {
   createStartMenuText(): string {

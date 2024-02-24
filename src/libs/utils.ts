@@ -1,9 +1,9 @@
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
-import { KeyValueItem } from "./config/ui-config.constants";
-import { MovieApiService } from "./service/movie-api.service";
-import { SessionData } from "./context/context.interface";
-import { IMovieApi, MovieItem } from "./service/movie-api.interface";
-import { TYPES } from "./config/ui-config.constants";
+import { KeyValueItem } from "../config/ui-config.constants";
+import { MovieApiService } from "../service/movie-api.service";
+import { SessionData } from "../context/context.interface";
+import { IMovieApi, MovieItem } from "../service/movie-api.interface";
+import { TYPES } from "../config/ui-config.constants";
 
 export async function generateNumberInlineQuery(
   start: number,
