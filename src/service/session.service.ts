@@ -18,7 +18,8 @@ export class SessionService implements ISessionService {
   }
 
   setMainMessage({ messageId, chatId }: MainMessage) {
-    this.mainMessage = { messageId, chatId };
+    this.mainMessage.chatId = chatId;
+    this.mainMessage.messageId = messageId;
   }
 
   getMainMessage(): MainMessage {
