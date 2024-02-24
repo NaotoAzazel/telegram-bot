@@ -1,25 +1,18 @@
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
-import Menu from "./config/menu.class";
-import { ISessionService } from "./service/session.interface";
 import { KeyValueItem } from "./config/ui-config.constants";
-import { IDatabase } from "./service/database.interface";
+import { MovieApiService } from "./service/movie-api.service";
+import { SessionData } from "./context/context.interface";
+import { IMovieApi, MovieItem } from "./service/movie-api.interface";
+import { TYPES } from "./config/ui-config.constants";
 
 export async function generateNumberInlineQuery(
   start: number,
   end: number,
   step: number,
-  userId: number,
   type: "minRating" | "maxRating" | "startYear" | "endYear",
-  database: IDatabase,
-  session: ISessionService
+  session: SessionData
 ): Promise<InlineQueryResultArticle[]> {
   const result: InlineQueryResultArticle[] = [];
-  const currentSession = await database.findById(userId);
-  if (!currentSession) {
-    throw new Error("Session not found");
-  }
-
-  const mainMessage = session.getMainMessage();
 
   for(let i = start; i <= end; i += step) {
     let formattedId: number | string = i;
@@ -28,7 +21,7 @@ export async function generateNumberInlineQuery(
     switch(type) {
       case "startYear":
       case "endYear": {
-        formattedTitle = currentSession[type] === formattedId
+        formattedTitle = session[type] === formattedId
           ? `(Выбрано) ${formattedId}`
           : `${formattedId}`;
         break;
@@ -37,23 +30,19 @@ export async function generateNumberInlineQuery(
       case "maxRating":
       case "minRating": {
         formattedId = formattedId.toFixed(1);
-        formattedTitle = currentSession[type].toFixed(1) === formattedId
+        formattedTitle = session[type].toFixed(1) === formattedId
           ? `(Выбрано) ${formattedId}`
           : `${formattedId}`;
         break;
       }
     }
 
-    const messageText = mainMessage.messageId < 0 
-      ? Menu.createErrorMenu()
-      : `Вы успешно изменили значение ${type} на ${formattedId}`
-
     result.push({
       type: "article",
       id: formattedId.toString(),
       title: formattedTitle,
       input_message_content: {
-        message_text: messageText,
+        message_text: `Вы успешно изменили значение ${type} на ${formattedId}`,
       }
     });
   }
@@ -62,40 +51,98 @@ export async function generateNumberInlineQuery(
 }
 
 export async function generateTextInlineQuery(
-  userId: number,
   type: "genre" | "type",
   object: KeyValueItem,
-  database: IDatabase,
-  session: ISessionService
+  session: SessionData
 ): Promise<InlineQueryResultArticle[]> {
   const result: InlineQueryResultArticle[] = [];
-  const currentSession = await database.findById(userId);
-  if (!currentSession) {
-    throw new Error("Session not found");
-  }
-
-  const mainMessage = session.getMainMessage();
 
   for(const key in object) {
     const value = object[key];
 
-    const formattedTitle = currentSession[type] === value 
+    const formattedTitle = session[type] === value 
       ? `(Выбрано) ${key}`
       : key;
-
-    const messageText = mainMessage.messageId < 0 
-      ? Menu.createErrorMenu()
-      : `Вы успешно изменили значение ${type} на ${key}`
 
     result.push({
       type: "article",
       id: value,
       title: formattedTitle,
       input_message_content: {
-        message_text: messageText,
+        message_text: `Вы успешно изменили значение ${type} на ${key}`,
       }
     });
   }
 
   return result;
 }
+
+export async function generateMovieInlineQuery(
+  options: {
+    searchType: "search" | "searchByParams" | "searchByTitle";
+    id?: number;
+    fields?: SessionData;
+    title?: string;
+  }
+): Promise<InlineQueryResultArticle[]> {
+  const { searchType, id, fields, title } = options;
+  const result: InlineQueryResultArticle[] = [];
+  const apiService: IMovieApi = new MovieApiService();
+  let movies: MovieItem[] = [];
+
+  switch(searchType) {
+    case "search": {
+      movies = (await apiService.search()).results;
+      console.log("🚀 ~ movies:", movies)
+      break;
+    }
+
+    case "searchByParams": {
+      movies = (await apiService.searchByParams(fields!, id!)).results;
+      break;
+    }
+
+    case "searchByTitle": {
+      movies = (await apiService.searchByTitle(title!)).results;
+      break;
+    }
+  }
+
+  if(!movies.length) {
+    result.push({
+      type: "article",
+      id: "not found",
+      title: "Ничего не найдено",
+      description: "Попробуйте ввести другой запрос или изменить фильтры",
+      input_message_content: {
+        message_text: "text",
+      },
+    })
+    return result;
+  }
+
+  for(let i = 0; i < movies.length; i++) {
+    const movie = movies[i];
+    const description
+      = `${findKeyByValue(TYPES, movie.type)} | ${movie.imdbrating || "Рейтинг не найден"} | ${movie.released}\n${movie.genre.join(", ")}`;
+
+    result.push({
+      type: "article",
+      id: movie.imdbid,
+      title: movie.title,
+      input_message_content: {
+        message_text: "text",
+      },
+      description,
+      thumbnail_url: movie.imageurl?.length ? movie.imageurl[0] : "https://demofree.sirv.com/nope-not-here.jpg",
+      thumbnail_height: 32,
+      thumbnail_width: 32
+    });
+  }
+
+  return result;
+}
+
+export const findKeyByValue = (object: KeyValueItem, value: string | number) => {
+  return Object.keys(object).find(key => object[key] === value);
+};

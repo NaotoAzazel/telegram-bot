@@ -1,6 +1,7 @@
 import { Telegraf } from "telegraf";
 import { IBotContext, SessionData } from "../context/context.interface";
-import { GENRES, TYPES, KeyValueItem } from "./ui-config.constants";
+import { GENRES, TYPES } from "./ui-config.constants";
+import { findKeyByValue } from "../utils";
 
 export default new class Menu {
   createStartMenuText(): string {
@@ -22,10 +23,6 @@ export default new class Menu {
   }
 
   createFilterMenuText(session: SessionData): string {
-    const findKeyByValue = (object: KeyValueItem, value: string | number) => {
-      return Object.keys(object).find(key => object[key] === value);
-    };
-
     const genre = session.genre 
       ? findKeyByValue(GENRES, session.genre)
       : "Все";
