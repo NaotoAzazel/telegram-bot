@@ -4,13 +4,47 @@ import { IBotContext, SessionData } from "../context/context.interface";
 import { ISessionService } from "../service/session.interface";
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
 import { generateNumberInlineQuery, generateTextInlineQuery, generateMovieInlineQuery } from "../libs/utils";
-import { GENRES, TYPES } from "../config/ui-config.constants";
+import { GENRES } from "../config/ui-config.constants";
 import Menu from "../config/menu.class";
 import { IDatabase } from "../service/database.interface";
+import { DEFAULT_VALUES } from "../schema/session.schema";
 
 export default class InlineEvent extends Command {
   constructor(bot: Telegraf<IBotContext>, session: ISessionService, database: IDatabase) { 
     super(bot, session, database);
+  }
+
+  async validateFilterValue(filterType: string, chosenValue: string, session: SessionData): Promise<any> {
+    switch (filterType) {
+      case "minRating":
+        return Number(chosenValue) > session.maxRating
+          ? { maxRating: chosenValue, minRating: chosenValue }
+          : { minRating: chosenValue };
+
+      case "maxRating":
+        return Number(chosenValue) < session.minRating
+          ? { maxRating: chosenValue, minRating: chosenValue }
+          : { maxRating: chosenValue };
+
+      case "startYear":
+        return Number(chosenValue) > session.endYear
+          ? { startYear: chosenValue, endYear: chosenValue }
+          : { startYear: chosenValue };
+
+      case "endYear":
+        return Number(chosenValue) < session.startYear
+          ? { startYear: chosenValue, endYear: chosenValue }
+          : { endYear: chosenValue };
+      
+      case "genre": {
+        const genres: number[] = session.genre;
+        const indexToRemove = genres.indexOf(Number(chosenValue));
+        
+        if(indexToRemove !== -1) genres.splice(indexToRemove, 1);
+        else genres.push(Number(chosenValue));
+        return { genre: genres };
+      }
+    }
   }
 
   handle(): void {
@@ -32,48 +66,20 @@ export default class InlineEvent extends Command {
         throw new Error("Session not found")
       }
 
-      const filterType = chosenResult.query.slice(7);
-      switch(filterType) {
-        case "minRating": {
-          if(Number(chosenResult.result_id) > session.maxRating) {
-            await this.database.updateById({ maxRating: chosenResult.result_id }, userId);
-          }
-          break;
-        }
-
-        case "maxRating": {
-          if(Number(chosenResult.result_id) < session.minRating) {
-            await this.database.updateById({ minRating: chosenResult.result_id }, userId);
-          }
-          break;
-        }
-
-        case "startYear": {
-          if(Number(chosenResult.result_id) > session.endYear) {
-            await this.database.updateById({ endYear: chosenResult.result_id }, userId);
-          }
-          break;
-        }
-
-        case "endYear": {
-          if(Number(chosenResult.result_id) < Number(session.startYear)) {
-            await this.database.updateById({ startYear: chosenResult.result_id }, userId);
-          }
-          break;
-        }
-
-        case "genre": {
-          if(chosenResult.result_id === "All") {
-            chosenResult.result_id = "";
-          }
-          break;
-        }
+      if(chosenResult.result_id.startsWith("selected_")) {
+        ctx.telegram.deleteMessage(userId, lastMessageId);
+        Menu.updateMenuText(this.bot, userId, "movie", chosenResult.result_id);
+        return;
       }
-      await this.database.updateById({ [filterType as keyof SessionData]: chosenResult.result_id }, userId);
-      Menu.updateMenuText(this.bot, ctx.from!.id, "filter");
+
+      const filterType: string = chosenResult.query.slice(7);
+      const newValue = await this.validateFilterValue(filterType, chosenResult.result_id, session);
+      await this.database.updateById(newValue, userId);
+
+      Menu.updateMenuText(this.bot, userId, "filter");
       
       if(lastMessageId) {
-        ctx.telegram.deleteMessage(ctx.from.id, lastMessageId);
+        ctx.telegram.deleteMessage(userId, lastMessageId);
       }
     })
 
@@ -116,14 +122,13 @@ export default class InlineEvent extends Command {
 
         case "startYear":
         case "endYear": {
-          results = await generateNumberInlineQuery(1975, 2020, 1, filterType, session);
+          results 
+            = await generateNumberInlineQuery(DEFAULT_VALUES.startYear, DEFAULT_VALUES.endYear, 1, filterType, session);
           break;
         }
 
-        case "genre":
-        case "type": {
-          results = 
-            await generateTextInlineQuery(filterType, filterType === "genre" ? GENRES : TYPES, session);
+        case "genre": {
+          results = await generateTextInlineQuery(filterType, GENRES, session);
           break;
         }
       }

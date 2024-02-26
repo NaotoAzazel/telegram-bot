@@ -20,7 +20,6 @@ export default class FilterCommand extends Command {
         minRating: DEFAULT_VALUES["minRating"],
         maxRating: DEFAULT_VALUES["maxRating"],
         genre: DEFAULT_VALUES["genre"],
-        type: DEFAULT_VALUES["type"]
       };
 
       await this.database?.updateById(preventDefault, ctx.from!.id);

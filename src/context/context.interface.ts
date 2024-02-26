@@ -6,8 +6,7 @@ export interface SessionData {
   endYear: number;
   minRating: number;
   maxRating: number;
-  genre: string;
-  type: string;
+  genre: number[];
   createdAt: Date;
 }
 

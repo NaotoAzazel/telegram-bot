@@ -1,11 +1,11 @@
 import { Telegraf } from "telegraf";
 import { IBotContext, SessionData } from "../context/context.interface";
-import { GENRES, TYPES } from "./ui-config.constants";
-import { findKeyByValue } from "../libs/utils";
+import { convertIdToGenre } from "../libs/utils";
+import { MovieDetail } from "../service/movie-api.interface";
 
 export default new class Menu {
   createStartMenuText(): string {
-    return "Для начала роботы с ботом нажмите ниже"
+    return "Для начала роботы с ботом нажмите ниже";
   }
 
   createMainMenuText(session: SessionData): string {
@@ -19,18 +19,14 @@ export default new class Menu {
     };
     const formattedDate = new Intl.DateTimeFormat("ru-RU", options).format(date);
 
-    return `🆔 ${session.id}\n🕗 Дата регистрации ${formattedDate}\n\nПриятного поиска!`
+    return `🆔 ${session.id}\n🕗 Дата регистрации ${formattedDate}\n\nПриятного поиска!`;
   }
 
   createFilterMenuText(session: SessionData): string {
-    const genre = session.genre 
-      ? findKeyByValue(GENRES, session.genre)
-      : "Все";
-
-    const type = session.type
-      ? findKeyByValue(TYPES, session.type)
-      : "Все";
-
+    const genre = !session.genre.length 
+      ? "Все"
+      : convertIdToGenre(session.genre).join(", ");
+      
     return (
       "Меню фильтров\n\n" +
       "Выбери фильтры и жми \"Искать по фильтру\`\n\n" +
@@ -38,21 +34,32 @@ export default new class Menu {
       `📈 Рейтинг: ${session.minRating} - ${session?.maxRating}\n` +
       `📅 Начиная с года: ${session.startYear}\n` +
       `📆 До года: ${session.endYear}\n` +
-      `🎵 Жанр: ${genre}\n` +
-      `🔀 Тип: ${type}\n`
+      `🎵 Жанр: ${genre}\n`
     );
   }
 
   createErrorMenu(): string {
-    return "Это сообщение больше не доступно для взимодействия с ним, отправьте команду /start для начала роботы."
+    return "Это сообщение больше не доступно для взимодействия с ним, отправьте команду /start для начала роботы.";
   }
 
-  updateMenuText(bot: Telegraf<IBotContext>, userId: number, data: "menu" | "filter"): void {
+  createMovieMenu(fields: MovieDetail): string {
+    const genres: string[] = fields.genres.map((genre) => genre.name);
+
+    return (
+      `${fields.title}\n\n` +
+      `Жанр: ${genres.join(", ")}\n` +
+      `Рейтинг: ${fields.vote_average || "Не найдено"}\n` +
+      `Вышел: ${fields.status}\n` +
+      `Описание:\n${fields.overview}`
+    );
+  }
+
+  updateMenuText(bot: Telegraf<IBotContext>, userId: number, data: "menu" | "filter" | "movie", id?: string): void {
     const uniqueNumber: number = new Date().getTime();
     bot.handleUpdate({
       update_id: uniqueNumber,
       callback_query: {
-        id: uniqueNumber.toString(),
+        id: id || uniqueNumber.toString(),
         from: { 
           id: userId, 
           is_bot: false, 

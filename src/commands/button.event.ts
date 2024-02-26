@@ -17,13 +17,8 @@ export default class ButtonEvent extends Command {
       const errorMenuText = Menu.createErrorMenu();
 
       if(callbackQuery && mainMessage!.messageId < 0) {
-        ctx.telegram.editMessageText(
-          callbackQuery.message?.chat.id, 
-          callbackQuery.message?.message_id,
-          undefined,
-          errorMenuText
-        )
-
+        await ctx.telegram.deleteMessage(callbackQuery.from.id, callbackQuery.message!.message_id);
+        ctx.reply(errorMenuText);
         return false;
       }
       next();

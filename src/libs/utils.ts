@@ -1,9 +1,9 @@
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
-import { KeyValueItem } from "../config/ui-config.constants";
+import { GenreItem } from "../config/ui-config.constants";
 import { MovieApiService } from "../service/movie-api.service";
 import { SessionData } from "../context/context.interface";
-import { IMovieApi, MovieItem } from "../service/movie-api.interface";
-import { TYPES } from "../config/ui-config.constants";
+import { IMovieApi, MovieDetail, SearchMovie } from "../service/movie-api.interface";
+import { GENRES } from "../config/ui-config.constants";
 
 export async function generateNumberInlineQuery(
   start: number,
@@ -51,25 +51,23 @@ export async function generateNumberInlineQuery(
 }
 
 export async function generateTextInlineQuery(
-  type: "genre" | "type",
-  object: KeyValueItem,
+  type: "genre",
+  genres: GenreItem[],
   session: SessionData
 ): Promise<InlineQueryResultArticle[]> {
   const result: InlineQueryResultArticle[] = [];
 
-  for(const key in object) {
-    const value = object[key];
-
-    const formattedTitle = session[type] === value 
-      ? `(Выбрано) ${key}`
-      : key;
+  for(const genre of genres) {
+    const formattedTitle = session.genre.indexOf(genre.id) !== -1
+      ? `(Выбрано) ${genre.name}`
+      : genre.name;
 
     result.push({
       type: "article",
-      id: value,
+      id: genre.id.toString(),
       title: formattedTitle,
       input_message_content: {
-        message_text: `Вы успешно изменили значение ${type} на ${key}`,
+        message_text: `Вы успешно изменили значение ${type} на ${genre.name}`,
       }
     });
   }
@@ -88,12 +86,11 @@ export async function generateMovieInlineQuery(
   const { searchType, id, fields, title } = options;
   const result: InlineQueryResultArticle[] = [];
   const apiService: IMovieApi = new MovieApiService();
-  let movies: MovieItem[] = [];
+  let movies: SearchMovie[] | MovieDetail[] = [];
 
   switch(searchType) {
     case "search": {
       movies = (await apiService.search()).results;
-      console.log("🚀 ~ movies:", movies)
       break;
     }
 
@@ -123,18 +120,22 @@ export async function generateMovieInlineQuery(
 
   for(let i = 0; i < movies.length; i++) {
     const movie = movies[i];
-    const description
-      = `${findKeyByValue(TYPES, movie.type)} | ${movie.imdbrating || "Рейтинг не найден"} | ${movie.released}\n${movie.genre.join(", ")}`;
+    const baseImageUrl = "https://image.tmdb.org/t/p/w500/";
+    const notFoundImageUrl = "https://demofree.sirv.com/nope-not-here.jpg";
+    const description = 
+      `${movie.release_date} | ` + 
+      `${movie.vote_average} | ` + 
+      `${movie.genre_ids?.length && convertIdToGenre(movie.genre_ids).join(", ")}`;
 
     result.push({
       type: "article",
-      id: movie.imdbid,
+      id: `selected_${movie.id}`,
       title: movie.title,
       input_message_content: {
         message_text: "text",
       },
       description,
-      thumbnail_url: movie.imageurl?.length ? movie.imageurl[0] : "https://demofree.sirv.com/nope-not-here.jpg",
+      thumbnail_url: movie.poster_path ? `${baseImageUrl}${movie.poster_path}` : notFoundImageUrl,
       thumbnail_height: 32,
       thumbnail_width: 32
     });
@@ -143,6 +144,11 @@ export async function generateMovieInlineQuery(
   return result;
 }
 
-export const findKeyByValue = (object: KeyValueItem, value: string | number) => {
-  return Object.keys(object).find(key => object[key] === value);
-};
+export const convertIdToGenre = (ids: number[]): string[] => {
+  const result: string[] = [];
+  for (const genreId of ids) { 
+    const genre = GENRES.find(genre => genre.id === genreId);
+    if(genre) result.push(genre.name);
+  }
+  return result;
+}

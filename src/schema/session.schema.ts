@@ -6,17 +6,15 @@ export type DefaultValues = {
   endYear: number;
   minRating: number;
   maxRating: number,
-  genre: string;
-  type: string;
+  genre: number[];
 }
 
 export const DEFAULT_VALUES: DefaultValues = {
-  startYear: 1975,
-  endYear: 2020,
+  startYear: 1980,
+  endYear: 2024,
   minRating: 1,
   maxRating: 10,
-  genre: "",
-  type: "movie"
+  genre: [],
 };
 
 const SessionModel = new Schema<SessionData>({
@@ -25,8 +23,7 @@ const SessionModel = new Schema<SessionData>({
   endYear: { type: Number, default: DEFAULT_VALUES.endYear },
   minRating: { type: Number, default: DEFAULT_VALUES.minRating },
   maxRating: { type: Number, default: DEFAULT_VALUES.maxRating },
-  genre: { type: String, default: DEFAULT_VALUES.genre },
-  type: { type: String, default: DEFAULT_VALUES.type }
+  genre: { type: [Number], default: DEFAULT_VALUES.genre },
 }, { timestamps: true });
 
 export default mongoose.model("SessionModel", SessionModel);
