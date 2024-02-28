@@ -4,6 +4,7 @@ import { MovieApiService } from "../service/movie-api/movie-api.service";
 import { SessionData } from "../context/context.interface";
 import { IMovieApi, MovieDetail, SearchMovie } from "../service/movie-api/movie-api.interface";
 import { GENRES } from "../config/ui-config.constants";
+import { movieConfig } from "../config/movie";
 
 export async function generateNumberInlineQuery(
   start: number,
@@ -120,8 +121,6 @@ export async function generateMovieInlineQuery(
 
   for(let i = 0; i < movies.length; i++) {
     const movie = movies[i];
-    const baseImageUrl = "https://image.tmdb.org/t/p/w500/";
-    const notFoundImageUrl = "https://demofree.sirv.com/nope-not-here.jpg";
     const description = 
       `${movie.release_date} | ` + 
       `${movie.vote_average} | ` + 
@@ -135,7 +134,8 @@ export async function generateMovieInlineQuery(
         message_text: "text",
       },
       description,
-      thumbnail_url: movie.poster_path ? `${baseImageUrl}${movie.poster_path}` : notFoundImageUrl,
+      thumbnail_url: 
+        movie.poster_path ? `${movieConfig.baseImageUrl}${movie.poster_path}` : movieConfig.notFoundImageUrl,
       thumbnail_height: 32,
       thumbnail_width: 32
     });

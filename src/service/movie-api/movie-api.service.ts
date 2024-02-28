@@ -3,14 +3,11 @@ import { ConfigService } from "../../config/config.service";
 import { IMovieApi, SearchResult, MovieDetail } from "./movie-api.interface";
 import axios from "axios";
 import { SessionData } from "../../context/context.interface";
+import { movieConfig } from "../../config/movie";
 
 export class MovieApiService implements IMovieApi {
   private accessToken: string;
-  private language: string = "ru";
-  private includeAdult: boolean = false;
-  private basicParams = {
-    language: this.language
-  }
+  private basicParams = { language: movieConfig.language };
 
   constructor() {
     const configService: IConfigService = new ConfigService();
@@ -40,7 +37,7 @@ export class MovieApiService implements IMovieApi {
     try {
       const params = {
         ...this.basicParams,
-        include_adult: this.includeAdult,
+        include_adult: movieConfig.includeAdult,
         include_video: false,
         page: 1,
         "release_date.gte": `${values.startYear}-01-01`,
@@ -92,7 +89,7 @@ export class MovieApiService implements IMovieApi {
       const params = {
         ...this.basicParams,
         query: searchString,
-        include_adult: this.includeAdult,
+        include_adult: movieConfig.includeAdult,
         page: 1 
       };
       const options = {

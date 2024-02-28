@@ -7,6 +7,7 @@ import { IDatabase } from "../service/database/database.interface";
 import { MovieApiService } from "../service/movie-api/movie-api.service";
 import { IMovieApi, MovieDetail } from "../service/movie-api/movie-api.interface";
 import Menu from "../config/menu.class";
+import { movieConfig } from "../config/movie";
 
 export default class MovieCommand extends Command {
   constructor(bot: Telegraf<IBotContext>, session: ISessionService, database: IDatabase) { 
@@ -16,7 +17,6 @@ export default class MovieCommand extends Command {
   handle(): void {
     this.bot.action("movie", async(ctx) => {
       try {
-        const baseImageUrl = "https://image.tmdb.org/t/p/w500/";
         const mainMessage = this.session.getMainMessage();
         const buttons = (BUTTONS.movieMenu.buttons as ButtonItem[]).map(button => 
           Markup.button.callback(button.name, button.value));
@@ -29,7 +29,7 @@ export default class MovieCommand extends Command {
         
         const newMainMessage = await ctx.telegram.sendPhoto(
           mainMessage.chatId,
-          baseImageUrl + movie.poster_path,
+          movieConfig.baseImageUrl + movie.poster_path,
           { caption: movieMenuText, parse_mode: "HTML" }
         );
   
