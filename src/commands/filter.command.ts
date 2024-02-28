@@ -14,41 +14,50 @@ export default class FilterCommand extends Command {
 
   handle(): void {
     this.bot.action("reset", async(ctx) => {
-      const preventDefault: DefaultValues = {
-        startYear: DEFAULT_VALUES["startYear"],
-        endYear: DEFAULT_VALUES["endYear"],
-        minRating: DEFAULT_VALUES["minRating"],
-        maxRating: DEFAULT_VALUES["maxRating"],
-        genre: DEFAULT_VALUES["genre"],
-      };
-
-      await this.database?.updateById(preventDefault, ctx.from!.id);
-      Menu.updateMenuText(this.bot, ctx.from!.id, "filter");
+      try {
+        const preventDefault: DefaultValues = {
+          startYear: DEFAULT_VALUES["startYear"],
+          endYear: DEFAULT_VALUES["endYear"],
+          minRating: DEFAULT_VALUES["minRating"],
+          maxRating: DEFAULT_VALUES["maxRating"],
+          genre: DEFAULT_VALUES["genre"],
+        };
+  
+        await this.database.updateById(preventDefault, ctx.from!.id);
+        Menu.updateMenuText(this.bot, ctx.from!.id, "filter");
+      } catch(err) {
+        console.error(err);
+      }
     })
 
     this.bot.action("filter", async(ctx) => {
-      const userId = ctx.from!.id;
-      const mainMessage = this.session?.getMainMessage();
-      const session = await this.database?.findById(userId);
-      if(!session) {
-        throw new Error("Session not found");
+      try {
+        const userId = ctx.from!.id;
+        const mainMessage = this.session?.getMainMessage();
+        const session = await this.database?.findById(userId);
+        if(!session) {
+          throw new Error("Session not found");
+        }
+  
+        const buttons = (BUTTONS.filterMenu.buttons as ButtonItem[]).map(button => 
+          Markup.button.callback(button.name, button.value)
+        );
+        const inlineButtons = (BUTTONS.filterMenu.switchToInline as ButtonItem[]).map(button => 
+          Markup.button.switchToCurrentChat(button.name, button.value)
+        );
+  
+        const filterMenuText = Menu.createFilterMenuText(session);
+        await ctx.telegram.editMessageText(
+          mainMessage?.chatId, mainMessage?.messageId, undefined, filterMenuText
+        );
+  
+        await ctx.telegram.editMessageReplyMarkup(mainMessage?.chatId, mainMessage?.messageId, undefined,
+          Markup.inlineKeyboard([...inlineButtons, ...buttons], { columns: 2 }).reply_markup
+        )
+      } catch(err) {
+        console.error(err);
       }
-
-      const buttons = (BUTTONS.filterMenu.buttons as ButtonItem[]).map(button => 
-        Markup.button.callback(button.name, button.value)
-      );
-      const inlineButtons = (BUTTONS.filterMenu.switchToInline as ButtonItem[]).map(button => 
-        Markup.button.switchToCurrentChat(button.name, button.value)
-      );
-
-      const filterMenuText = Menu.createFilterMenuText(session);
-      await ctx.telegram.editMessageText(
-        mainMessage?.chatId, mainMessage?.messageId, undefined, filterMenuText
-      );
-
-      await ctx.telegram.editMessageReplyMarkup(mainMessage?.chatId, mainMessage?.messageId, undefined,
-        Markup.inlineKeyboard([...inlineButtons, ...buttons], { columns: 2 }).reply_markup
-      )
     });
+    
   }
 }

@@ -13,22 +13,26 @@ export default class StartCommand extends Command {
 
   handle(): void {
     this.bot.start(async(ctx) => {
-      const id = ctx.from.id;
-      const buttons = (BUTTONS.startMenu.buttons as ButtonItem[]).map(button => 
-        Markup.button.callback(button.name, button.value)
-      );
-
-      const userSession = await this.database.findById(id);
-      if(!userSession) {
-        await this.database.create(id);
+      try {
+        const id = ctx.from.id;
+        const buttons = (BUTTONS.startMenu.buttons as ButtonItem[]).map(button => 
+          Markup.button.callback(button.name, button.value)
+        );
+  
+        const userSession = await this.database.findById(id);
+        if(!userSession) {
+          await this.database.create(id);
+        }
+  
+        const startMenuText = Menu.createStartMenuText();
+        const replyMessage = await ctx.reply(startMenuText, Markup.inlineKeyboard(buttons));
+        this.session.setMainMessage({
+          messageId: replyMessage.message_id, 
+          chatId: replyMessage.chat.id 
+        });
+      } catch(err) {
+        console.error(err);
       }
-
-      const startMenuText = Menu.createStartMenuText();
-      const replyMessage = await ctx.reply(startMenuText, Markup.inlineKeyboard(buttons));
-      this.session.setMainMessage({
-        messageId: replyMessage.message_id, 
-        chatId: replyMessage.chat.id 
-      });
     });
   }
 }

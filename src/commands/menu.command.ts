@@ -14,37 +14,41 @@ export default class MenuCommand extends Command {
 
   handle(): void {
     this.bot.action(["menu", "redirect_menu"], async(ctx) => {
-      const userId = ctx.from!.id;
-      const mainMessage = this.session.getMainMessage();
-      const session = await this.database.findById(userId);
-      if(!session) {
-        throw new Error("Session not found");
+      try {
+        const userId = ctx.from!.id;
+        const mainMessage = this.session.getMainMessage();
+        const session = await this.database.findById(userId);
+        if(!session) {
+          throw new Error("Session not found");
+        }
+  
+        const buttons = (BUTTONS.mainMenu.buttons as ButtonItem[]).map(button => 
+          Markup.button.callback(button.name, button.value));
+          
+        const inlineButtons = (BUTTONS.mainMenu.switchToInline as ButtonItem[]).map(button => 
+          Markup.button.switchToCurrentChat(button.name, button.value));
+  
+        const mainMenuText = Menu.createMainMenuText(session);
+        
+        // redirected from movie menu
+        if(ctx.has(callbackQuery("data")) && ctx.callbackQuery.data.startsWith("redirect_")) {
+          await ctx.telegram.deleteMessage(mainMessage.chatId, mainMessage.messageId);
+          
+          const newMainMessage = await ctx.telegram.sendMessage(mainMessage.chatId, mainMenuText);
+          this.session.setMainMessage({ 
+            messageId: newMainMessage.message_id, chatId: newMainMessage.chat.id 
+          });
+          
+          await ctx.telegram.editMessageReplyMarkup(mainMessage.chatId, mainMessage.messageId, undefined,
+            Markup.inlineKeyboard([...buttons, ...inlineButtons]).reply_markup
+          );
+          return;
+        }
+  
+        ctx.editMessageText(mainMenuText, Markup.inlineKeyboard([...buttons, ...inlineButtons]));
+      } catch(err) {
+        console.error(err);
       }
-
-      const buttons = (BUTTONS.mainMenu.buttons as ButtonItem[]).map(button => 
-        Markup.button.callback(button.name, button.value));
-        
-      const inlineButtons = (BUTTONS.mainMenu.switchToInline as ButtonItem[]).map(button => 
-        Markup.button.switchToCurrentChat(button.name, button.value));
-
-      const mainMenuText = Menu.createMainMenuText(session);
-      
-      // redirected from movie menu
-      if(ctx.has(callbackQuery("data")) && ctx.callbackQuery.data.startsWith("redirect_")) {
-        await ctx.telegram.deleteMessage(mainMessage.chatId, mainMessage.messageId);
-        
-        const newMainMessage = await ctx.telegram.sendMessage(mainMessage.chatId, mainMenuText);
-        this.session.setMainMessage({ 
-          messageId: newMainMessage.message_id, chatId: newMainMessage.chat.id 
-        });
-        
-        await ctx.telegram.editMessageReplyMarkup(mainMessage.chatId, mainMessage.messageId, undefined,
-          Markup.inlineKeyboard([...buttons, ...inlineButtons]).reply_markup
-        );
-        return;
-      }
-
-      ctx.editMessageText(mainMenuText, Markup.inlineKeyboard([...buttons, ...inlineButtons]));
     })
   }
 }

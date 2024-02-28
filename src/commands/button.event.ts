@@ -12,16 +12,20 @@ export default class ButtonEvent extends Command {
 
   handle(): void {
     this.bot.on("callback_query", async(ctx, next) => {
-      const mainMessage = this.session?.getMainMessage();
-      const callbackQuery = ctx.callbackQuery;
-      const errorMenuText = Menu.createErrorMenu();
-
-      if(callbackQuery && mainMessage!.messageId < 0) {
-        await ctx.telegram.deleteMessage(callbackQuery.from.id, callbackQuery.message!.message_id);
-        ctx.reply(errorMenuText);
-        return false;
+      try {
+        const mainMessage = this.session?.getMainMessage();
+        const callbackQuery = ctx.callbackQuery;
+        const errorMenuText = Menu.createErrorMenu();
+  
+        if(callbackQuery && mainMessage!.messageId < 0) {
+          await ctx.telegram.deleteMessage(callbackQuery.from.id, callbackQuery.message!.message_id);
+          ctx.reply(errorMenuText);
+          return false;
+        }
+        next();
+      } catch(err) {
+        console.error(err);
       }
-      next();
     });
   }
 }

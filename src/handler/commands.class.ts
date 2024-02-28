@@ -33,7 +33,11 @@ export class CommandManager implements ICommandManager {
 
   handleCommands(): void {
     for(const command of this.commands) {
-      command.handle();
+      try {
+        command.handle();
+      } catch (err) {
+        console.error("An error occurred while executing the command:", err);
+      }
     }
   }
 }

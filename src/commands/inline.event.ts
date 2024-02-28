@@ -54,99 +54,107 @@ export default class InlineEvent extends Command {
     });
 
     this.bot.on("chosen_inline_result", async(ctx) => {
-      const userId = ctx.from.id;
-      const chosenResult = ctx.chosenInlineResult;
-      const mainMessage = this.session.getMainMessage();
-      const lastMessageId = this.session.getLastMessageId();
-
-      if(mainMessage.messageId < 0) return;
-
-      const session = await this.database.findById(userId);
-      if(!session) {
-        throw new Error("Session not found")
-      }
-
-      if(chosenResult.result_id.startsWith("selected_")) {
-        ctx.telegram.deleteMessage(userId, lastMessageId);
-        Menu.updateMenuText(this.bot, userId, "movie", chosenResult.result_id);
-        return;
-      }
-
-      const filterType: string = chosenResult.query.slice(7);
-      const newValue = await this.validateFilterValue(filterType, chosenResult.result_id, session);
-      await this.database.updateById(newValue, userId);
-
-      Menu.updateMenuText(this.bot, userId, "filter");
-      
-      if(lastMessageId) {
-        ctx.telegram.deleteMessage(userId, lastMessageId);
+      try {
+        const userId = ctx.from.id;
+        const chosenResult = ctx.chosenInlineResult;
+        const mainMessage = this.session.getMainMessage();
+        const lastMessageId = this.session.getLastMessageId();
+  
+        if(mainMessage.messageId < 0) return;
+  
+        const session = await this.database.findById(userId);
+        if(!session) {
+          throw new Error("Session not found")
+        }
+  
+        if(chosenResult.result_id.startsWith("selected_")) {
+          ctx.telegram.deleteMessage(userId, lastMessageId);
+          Menu.updateMenuText(this.bot, userId, "movie", chosenResult.result_id);
+          return;
+        }
+  
+        const filterType: string = chosenResult.query.slice(7);
+        const newValue = await this.validateFilterValue(filterType, chosenResult.result_id, session);
+        await this.database.updateById(newValue, userId);
+  
+        Menu.updateMenuText(this.bot, userId, "filter");
+        
+        if(lastMessageId) {
+          ctx.telegram.deleteMessage(userId, lastMessageId);
+        }
+      } catch(err) {
+        console.error(err);
       }
     })
 
     this.bot.on("inline_query", async(ctx) => {
-      const userId = ctx.from.id;
-      const inlineQuery = ctx.inlineQuery.query;
-      const mainMessage = this.session.getMainMessage();
-      let results: InlineQueryResultArticle[] = [];
-      
-      if(mainMessage.messageId < 0) {
-        results = [{
-          type: "article",
-          id: "error",
-          title: Menu.createErrorMenu(),
-          input_message_content: {
-            message_text: Menu.createErrorMenu(),
+      try {
+        const userId = ctx.from.id;
+        const inlineQuery = ctx.inlineQuery.query;
+        const mainMessage = this.session.getMainMessage();
+        let results: InlineQueryResultArticle[] = [];
+        
+        if(mainMessage.messageId < 0) {
+          results = [{
+            type: "article",
+            id: "error",
+            title: Menu.createErrorMenu(),
+            input_message_content: {
+              message_text: Menu.createErrorMenu(),
+            }
+          }];
+          
+          ctx.answerInlineQuery(results, { cache_time: 1 });
+          return false;
+        }
+  
+        const session = await this.database.findById(userId);
+        if(!session) {
+          throw new Error("Session not found");
+        }
+  
+        if(!inlineQuery.startsWith("filter") && inlineQuery.length >= 1) {
+          results = await generateMovieInlineQuery({ searchType: "searchByTitle", title: inlineQuery });
+        }
+  
+        const filterType = inlineQuery.slice(7);
+        switch(filterType) {
+          case "minRating":
+          case "maxRating": {
+            results = await generateNumberInlineQuery(0.2, 10, 0.2, filterType, session);
+            break;
           }
-        }];
+  
+          case "startYear":
+          case "endYear": {
+            results 
+              = await generateNumberInlineQuery(DEFAULT_VALUES.startYear, DEFAULT_VALUES.endYear, 1, filterType, session);
+            break;
+          }
+  
+          case "genre": {
+            results = await generateTextInlineQuery(filterType, GENRES, session);
+            break;
+          }
+        }
+  
+        switch(inlineQuery) {
+          case "": {
+            results = await generateMovieInlineQuery({ searchType: "search" });
+            break;
+          }
+  
+          case "filter": {
+            results 
+              = await generateMovieInlineQuery({ searchType: "searchByParams", id: userId, fields: session });
+            break;
+          }
+        }
         
         ctx.answerInlineQuery(results, { cache_time: 1 });
-        return false;
+      } catch(err) {
+        console.error(err);
       }
-
-      const session = await this.database.findById(userId);
-      if(!session) {
-        throw new Error("Session not found");
-      }
-
-      if(!inlineQuery.startsWith("filter") && inlineQuery.length >= 1) {
-        results = await generateMovieInlineQuery({ searchType: "searchByTitle", title: inlineQuery });
-      }
-
-      const filterType = inlineQuery.slice(7);
-      switch(filterType) {
-        case "minRating":
-        case "maxRating": {
-          results = await generateNumberInlineQuery(0.2, 10, 0.2, filterType, session);
-          break;
-        }
-
-        case "startYear":
-        case "endYear": {
-          results 
-            = await generateNumberInlineQuery(DEFAULT_VALUES.startYear, DEFAULT_VALUES.endYear, 1, filterType, session);
-          break;
-        }
-
-        case "genre": {
-          results = await generateTextInlineQuery(filterType, GENRES, session);
-          break;
-        }
-      }
-
-      switch(inlineQuery) {
-        case "": {
-          results = await generateMovieInlineQuery({ searchType: "search" });
-          break;
-        }
-
-        case "filter": {
-          results 
-            = await generateMovieInlineQuery({ searchType: "searchByParams", id: userId, fields: session });
-          break;
-        }
-      }
-      
-      ctx.answerInlineQuery(results, { cache_time: 1 });
     })
   }
 }
