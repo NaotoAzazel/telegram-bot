@@ -1,8 +1,8 @@
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
 import { GenreItem } from "../config/ui-config.constants";
-import { MovieApiService } from "../service/movie-api.service";
+import { MovieApiService } from "../service/movie-api/movie-api.service";
 import { SessionData } from "../context/context.interface";
-import { IMovieApi, MovieDetail, SearchMovie } from "../service/movie-api.interface";
+import { IMovieApi, MovieDetail, SearchMovie } from "../service/movie-api/movie-api.interface";
 import { GENRES } from "../config/ui-config.constants";
 
 export async function generateNumberInlineQuery(

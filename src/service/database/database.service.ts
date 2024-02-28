@@ -1,7 +1,7 @@
 import { IDatabase, UpdateFields } from "./database.interface";
 import mongoose from "mongoose";
-import SessionModel from "../schema/session.schema";
-import { SessionData } from "../context/context.interface";
+import SessionModel from "../../schema/session.schema";
+import { SessionData } from "../../context/context.interface";
 
 export class DatabaseService implements IDatabase {
   async create(id: number): Promise<void> {

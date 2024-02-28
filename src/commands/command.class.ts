@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { IBotContext } from "../context/context.interface";
-import { ISessionService } from "../service/session.interface";
-import { IDatabase } from "../service/database.interface";
+import { ISessionService } from "../service/session/session.interface";
+import { IDatabase } from "../service/database/database.interface";
 
 export abstract class Command {
   constructor(

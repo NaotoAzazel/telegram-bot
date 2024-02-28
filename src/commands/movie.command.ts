@@ -1,11 +1,11 @@
 import { Markup, Telegraf } from "telegraf";
 import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
-import { ISessionService } from "../service/session.interface";
+import { ISessionService } from "../service/session/session.interface";
 import { BUTTONS, ButtonItem } from "../config/ui-config.constants";
-import { IDatabase } from "../service/database.interface";
-import { MovieApiService } from "../service/movie-api.service";
-import { IMovieApi, MovieDetail } from "../service/movie-api.interface";
+import { IDatabase } from "../service/database/database.interface";
+import { MovieApiService } from "../service/movie-api/movie-api.service";
+import { IMovieApi, MovieDetail } from "../service/movie-api/movie-api.interface";
 import Menu from "../config/menu.class";
 
 export default class MovieCommand extends Command {

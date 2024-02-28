@@ -1,11 +1,11 @@
 import { Markup, Telegraf } from "telegraf";
 import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
-import { ISessionService } from "../service/session.interface";
+import { ISessionService } from "../service/session/session.interface";
 import { DEFAULT_VALUES, DefaultValues } from "../schema/session.schema";
 import { BUTTONS, ButtonItem } from "../config/ui-config.constants";
 import Menu from "../config/menu.class";
-import { IDatabase } from "../service/database.interface";
+import { IDatabase } from "../service/database/database.interface";
 
 export default class FilterCommand extends Command {
   constructor(bot: Telegraf<IBotContext>, session: ISessionService, database: IDatabase) { 

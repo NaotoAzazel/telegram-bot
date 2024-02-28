@@ -2,9 +2,9 @@ import fs from "fs";
 import { Command } from "../commands/command.class";
 import { Telegraf } from "telegraf";
 import { IBotContext } from "../context/context.interface";
-import { ISessionService } from "../service/session.interface";
+import { ISessionService } from "../service/session/session.interface";
 import { ICommandManager } from "./commands.interface";
-import { IDatabase } from "../service/database.interface";
+import { IDatabase } from "../service/database/database.interface";
 
 export class CommandManager implements ICommandManager {
   private commands: Command[] = [];

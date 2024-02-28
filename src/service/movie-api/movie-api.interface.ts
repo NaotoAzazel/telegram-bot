@@ -1,4 +1,4 @@
-import { DefaultValues } from "../schema/session.schema";
+import { DefaultValues } from "../../schema/session.schema";
 
 type Genre = {
   id: number;

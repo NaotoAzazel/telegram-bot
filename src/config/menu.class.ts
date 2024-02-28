@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { IBotContext, SessionData } from "../context/context.interface";
 import { convertIdToGenre } from "../libs/utils";
-import { MovieDetail } from "../service/movie-api.interface";
+import { MovieDetail } from "../service/movie-api/movie-api.interface";
 
 export default new class Menu {
   createStartMenuText(): string {

@@ -1,9 +1,9 @@
 import { Telegraf } from "telegraf";
 import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
-import { ISessionService } from "../service/session.interface";
+import { ISessionService } from "../service/session/session.interface";
 import Menu from "../config/menu.class";
-import { IDatabase } from "../service/database.interface";
+import { IDatabase } from "../service/database/database.interface";
 
 export default class ButtonEvent extends Command {
   constructor(bot: Telegraf<IBotContext>, session: ISessionService, database: IDatabase) { 

@@ -1,8 +1,8 @@
-import { IConfigService } from "../config/config.interface";
-import { ConfigService } from "../config/config.service";
+import { IConfigService } from "../../config/config.interface";
+import { ConfigService } from "../../config/config.service";
 import { IMovieApi, SearchResult, MovieDetail } from "./movie-api.interface";
 import axios from "axios";
-import { SessionData } from "../context/context.interface";
+import { SessionData } from "../../context/context.interface";
 
 export class MovieApiService implements IMovieApi {
   private accessToken: string;

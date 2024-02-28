@@ -2,10 +2,10 @@ import { Telegraf } from "telegraf";
 import { IConfigService } from "./config/config.interface";
 import { ConfigService } from "./config/config.service";
 import { IBotContext } from "./context/context.interface";
-import { IDatabase } from "./service/database.interface";
-import { DatabaseService } from "./service/database.service";
-import { ISessionService } from "./service/session.interface";
-import { SessionService } from "./service/session.service";
+import { IDatabase } from "./service/database/database.interface";
+import { DatabaseService } from "./service/database/database.service";
+import { ISessionService } from "./service/session/session.interface";
+import { SessionService } from "./service/session/session.service";
 import { ICommandManager } from "./handler/commands.interface";
 import { CommandManager } from "./handler/commands.class";
 

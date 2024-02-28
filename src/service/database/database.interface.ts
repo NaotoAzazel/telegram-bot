@@ -1,5 +1,5 @@
-import { SessionData } from "../context/context.interface";
-import { DefaultValues } from "../schema/session.schema";
+import { SessionData } from "../../context/context.interface";
+import { DefaultValues } from "../../schema/session.schema";
 
 export type UpdateFields = Partial<Record<keyof DefaultValues, DefaultValues[keyof DefaultValues]>>;
 
