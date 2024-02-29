@@ -9,7 +9,7 @@ export default new class Menu {
   }
 
   createMainMenuText(session: SessionData): string {
-    const date = session.createdAt;
+    const date: Date = new Date(session.createdAt);
     date.setHours(date.getHours());
 
     const options: Intl.DateTimeFormatOptions = {
