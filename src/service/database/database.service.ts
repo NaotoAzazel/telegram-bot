@@ -1,39 +1,71 @@
-import { IDatabase, UpdateFields } from "./database.interface";
 import mongoose from "mongoose";
-import SessionModel from "../../schema/session.schema";
+import SessionModel, { DefaultValues } from "../../schema/session.schema";
 import { SessionData } from "../../context/context.interface";
 
-export class DatabaseService implements IDatabase {
-  async create(id: number): Promise<void> {
+export type UpdateFields = Partial<Record<keyof DefaultValues, DefaultValues[keyof DefaultValues]>>;
+
+export class DatabaseService {
+  private static instance: DatabaseService | null = null;
+  private connectUrl: string;
+
+  private constructor(connectUrl: string) {
+    this.connectUrl = connectUrl;
+  }
+
+  static async create(id: number): Promise<SessionData> {
+    if(!DatabaseService.instance) {
+      throw new Error("No connection to database found");
+    }
+
     try {
-      await SessionModel.create({ id });
+      return await SessionModel.create({ id });
     } catch(err) {
       throw new Error(err as string);
     }
   }
 
-  async findById(id: number): Promise<SessionData | null> {
+  static async findById(id: number): Promise<SessionData> {
+    if(!DatabaseService.instance) {
+      throw new Error("No connection to database found");
+    }
+
     try {
-      const session = await SessionModel.findOne({ id });
+      let session: SessionData | null = await SessionModel.findOne({ id });
+      if(!session) session = await DatabaseService.create(id);
+
       return session;
     } catch(err) {
       throw new Error(err as string);
     }
   }
 
-  async updateById(fields: UpdateFields, id: number): Promise<void> {
+  static async updateById(fields: UpdateFields, id: number): Promise<void> {
+    if(!DatabaseService.instance) {
+      throw new Error("No connection to database found");
+    }
+
     try {
-      await SessionModel.findOneAndUpdate({ id }, fields, { new: true });
+      let session: SessionData | null = await SessionModel.findOneAndUpdate({ id }, fields, { new: true });
+      if(session) session = await DatabaseService.create(id);
     } catch(err) {
       throw new Error(err as string);
     }
   }
 
-  async connect(connectUrl: string): Promise<void> {
-    await mongoose.connect(connectUrl)
-      .then(() => console.log("Successfully connected to database"))
-      .catch(() => {
-        throw new Error("Failed to connect to the database");
-      });
+  static async connect(connectUrl: string): Promise<DatabaseService> {
+    try {
+      if(!DatabaseService.instance) {
+        await mongoose.connect(connectUrl);
+        DatabaseService.instance = new DatabaseService(connectUrl);
+      }
+
+      await mongoose.disconnect();
+      await mongoose.connect(connectUrl);
+
+      DatabaseService.instance.connectUrl = connectUrl;
+      return DatabaseService.instance;
+    } catch(err) {
+      throw new Error(err as string);
+    }
   }
 }

@@ -2,16 +2,18 @@ import { Telegraf } from "telegraf";
 import { Command } from "./command.class";
 import { IBotContext, SessionData } from "../context/context.interface";
 import { ISessionService } from "../service/session/session.interface";
-import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
-import { generateNumberInlineQuery, generateTextInlineQuery, generateMovieInlineQuery } from "../libs/utils";
+import { ChosenInlineResult, InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
+import { generateNumberInlineQuery, generateTextInlineQuery, 
+  generateMovieInlineQuery } from "../libs/utils";
 import { GENRES } from "../config/ui-config.constants";
-import Menu from "../config/menu.class";
-import { IDatabase } from "../service/database/database.interface";
 import { DEFAULT_VALUES } from "../schema/session.schema";
+import { MainMessage } from "../service/session/session.service";
+import { DatabaseService } from "../service/database/database.service";
+import Menu from "../config/menu.class";
 
 export default class InlineEvent extends Command {
-  constructor(bot: Telegraf<IBotContext>, session: ISessionService, database: IDatabase) { 
-    super(bot, session, database);
+  constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
+    super(bot, session);
   }
 
   async validateFilterValue(filterType: string, chosenValue: string, session: SessionData): Promise<any> {
@@ -55,18 +57,15 @@ export default class InlineEvent extends Command {
 
     this.bot.on("chosen_inline_result", async(ctx) => {
       try {
-        const userId = ctx.from.id;
-        const chosenResult = ctx.chosenInlineResult;
-        const mainMessage = this.session.getMainMessage();
-        const lastMessageId = this.session.getLastMessageId();
+        const userId: number = ctx.from.id;
+        const chosenResult: ChosenInlineResult = ctx.chosenInlineResult;
+        const mainMessage: MainMessage = this.session.getMainMessage();
+        const lastMessageId: number = this.session.getLastMessageId();
   
         if(mainMessage.messageId < 0) return;
   
-        const session = await this.database.findById(userId);
-        if(!session) {
-          throw new Error("Session not found")
-        }
-  
+        const session = await DatabaseService.findById(userId);
+
         if(chosenResult.result_id.startsWith("selected_")) {
           ctx.telegram.deleteMessage(userId, lastMessageId);
           Menu.updateMenuText(this.bot, userId, "movie", chosenResult.result_id);
@@ -75,7 +74,7 @@ export default class InlineEvent extends Command {
   
         const filterType: string = chosenResult.query.slice(7);
         const newValue = await this.validateFilterValue(filterType, chosenResult.result_id, session);
-        await this.database.updateById(newValue, userId);
+        await DatabaseService.updateById(newValue, userId);
   
         Menu.updateMenuText(this.bot, userId, "filter");
         
@@ -89,9 +88,9 @@ export default class InlineEvent extends Command {
 
     this.bot.on("inline_query", async(ctx) => {
       try {
-        const userId = ctx.from.id;
-        const inlineQuery = ctx.inlineQuery.query;
-        const mainMessage = this.session.getMainMessage();
+        const userId: number = ctx.from.id;
+        const inlineQuery: string = ctx.inlineQuery.query;
+        const mainMessage: MainMessage = this.session.getMainMessage();
         let results: InlineQueryResultArticle[] = [];
         
         if(mainMessage.messageId < 0) {
@@ -108,16 +107,13 @@ export default class InlineEvent extends Command {
           return false;
         }
   
-        const session = await this.database.findById(userId);
-        if(!session) {
-          throw new Error("Session not found");
-        }
+        const session = await DatabaseService.findById(userId);
   
         if(!inlineQuery.startsWith("filter") && inlineQuery.length >= 1) {
           results = await generateMovieInlineQuery({ searchType: "searchByTitle", title: inlineQuery });
         }
   
-        const filterType = inlineQuery.slice(7);
+        const filterType: string = inlineQuery.slice(7);
         switch(filterType) {
           case "minRating":
           case "maxRating": {

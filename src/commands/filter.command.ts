@@ -1,15 +1,16 @@
 import { Markup, Telegraf } from "telegraf";
 import { Command } from "./command.class";
-import { IBotContext } from "../context/context.interface";
+import { IBotContext, SessionData } from "../context/context.interface";
 import { ISessionService } from "../service/session/session.interface";
 import { DEFAULT_VALUES, DefaultValues } from "../schema/session.schema";
 import { BUTTONS, ButtonItem } from "../config/ui-config.constants";
+import { DatabaseService } from "../service/database/database.service";
+import { MainMessage } from "../service/session/session.service";
 import Menu from "../config/menu.class";
-import { IDatabase } from "../service/database/database.interface";
 
 export default class FilterCommand extends Command {
-  constructor(bot: Telegraf<IBotContext>, session: ISessionService, database: IDatabase) { 
-    super(bot, session, database);
+  constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
+    super(bot, session);
   }
 
   handle(): void {
@@ -22,8 +23,8 @@ export default class FilterCommand extends Command {
           maxRating: DEFAULT_VALUES["maxRating"],
           genre: DEFAULT_VALUES["genre"],
         };
-  
-        await this.database.updateById(preventDefault, ctx.from!.id);
+        
+        await DatabaseService.updateById(preventDefault, ctx.from!.id);
         Menu.updateMenuText(this.bot, ctx.from!.id, "filter");
       } catch(err) {
         console.error(err);
@@ -32,12 +33,9 @@ export default class FilterCommand extends Command {
 
     this.bot.action("filter", async(ctx) => {
       try {
-        const userId = ctx.from!.id;
-        const mainMessage = this.session?.getMainMessage();
-        const session = await this.database?.findById(userId);
-        if(!session) {
-          throw new Error("Session not found");
-        }
+        const userId: number = ctx.from!.id;
+        const mainMessage: MainMessage = this.session.getMainMessage();
+        const session: SessionData = await DatabaseService.findById(userId);
   
         const buttons = (BUTTONS.filterMenu.buttons as ButtonItem[]).map(button => 
           Markup.button.callback(button.name, button.value)
