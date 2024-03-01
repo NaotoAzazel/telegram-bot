@@ -24,7 +24,7 @@ class Bot {
     await this.commands.load("dist/commands");
     this.commands.handleCommands();
 
-    DatabaseService.connect(this.configService.get("MONGO_URL"));
+    await DatabaseService.connect(this.configService.get("MONGO_URL"));
 
     const movieApi = new MovieApiService();
     this.session.setGenres(await movieApi.getGenres());
