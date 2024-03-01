@@ -5,6 +5,7 @@ import { ISessionService } from "../service/session/session.interface";
 import { ChosenInlineResult, InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
 import { generateNumberInlineQuery, generateTextInlineQuery, 
   generateMovieInlineQuery } from "../libs/utils";
+import { GENRES } from "../config/ui-config.constants";
 import { DEFAULT_VALUES } from "../schema/session.schema";
 import { MainMessage } from "../service/session/session.service";
 import { DatabaseService } from "../service/database/database.service";
@@ -128,7 +129,7 @@ export default class InlineEvent extends Command {
           }
   
           case "genre": {
-            results = await generateTextInlineQuery(filterType, this.session.getGenres(), session);
+            results = await generateTextInlineQuery(filterType, GENRES, session);
             break;
           }
         }
