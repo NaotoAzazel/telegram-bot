@@ -7,6 +7,7 @@ import { ISessionService } from "./service/session/session.interface";
 import { SessionService } from "./service/session/session.service";
 import { ICommandManager } from "./handler/commands.interface";
 import { CommandManager } from "./handler/commands.class";
+import { MovieApiService } from "./service/movie-api/movie-api.service";
 
 class Bot {
   bot: Telegraf<IBotContext>;
@@ -22,7 +23,12 @@ class Bot {
   async start() {
     await this.commands.load("dist/commands");
     this.commands.handleCommands();
+
     DatabaseService.connect(this.configService.get("MONGO_URL"));
+
+    const movieApi = new MovieApiService();
+    this.session.setGenres(await movieApi.getGenres());
+
     this.bot.launch();
     console.log("Bot successfully start");
   }

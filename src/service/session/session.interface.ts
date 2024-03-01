@@ -1,3 +1,4 @@
+import { GenreItem } from "../movie-api/movie-api.interface";
 import { MainMessage } from "./session.service";
 
 export interface ISessionService {
@@ -5,4 +6,6 @@ export interface ISessionService {
   getLastMessageId(): number;
   setMainMessage({ messageId, chatId }: MainMessage): void;
   getMainMessage(): MainMessage;
+  setGenres(genres: GenreItem[]): void;
+  getGenres(): GenreItem[];
 }

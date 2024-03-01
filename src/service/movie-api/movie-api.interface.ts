@@ -68,9 +68,15 @@ export type SearchResult = Result & {
   results: SearchMovie[];
 }
 
+export type GenreItem = {
+  id: number;
+  name: string;
+}
+
 export interface IMovieApi {
   search(): Promise<SearchResult>;
   searchByParams(values: DefaultValues, id: number): Promise<SearchResult>;
   searchById(id: string): Promise<MovieDetail>;
   searchByTitle(title: string): Promise<SearchResult>;
+  getGenres(): Promise<GenreItem[]>;
 }

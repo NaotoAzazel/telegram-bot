@@ -1,3 +1,4 @@
+import { GenreItem } from "../movie-api/movie-api.interface";
 import { ISessionService } from "./session.interface";
 
 export type MainMessage = {
@@ -6,6 +7,7 @@ export type MainMessage = {
 }
 
 export class SessionService implements ISessionService {
+  private genres: GenreItem[] = [];
   private lastMessageId: number = -1;
   private mainMessage: MainMessage = { messageId: -1, chatId: -1 };
 
@@ -24,5 +26,13 @@ export class SessionService implements ISessionService {
 
   getMainMessage(): MainMessage {
     return this.mainMessage;
+  }
+
+  setGenres(genres: GenreItem[]): void {
+    this.genres = genres;
+  }
+
+  getGenres(): GenreItem[] {
+    return this.genres;
   }
 }
