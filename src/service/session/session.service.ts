@@ -10,6 +10,19 @@ export class SessionService implements ISessionService {
   private genres: GenreItem[] = [];
   private lastMessageId: number = -1;
   private mainMessage: MainMessage = { messageId: -1, chatId: -1 };
+  private static instance: SessionService | null = null;
+
+  constructor() {
+    SessionService.instance = this;
+  }
+
+  static getInstance(): SessionService {
+    if(!SessionService.instance) {
+      SessionService.instance = new SessionService();
+    }
+
+    return SessionService.instance;
+  }
 
   setLastMessageId(messageId: number) {
     this.lastMessageId = messageId;
