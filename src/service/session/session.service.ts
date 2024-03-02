@@ -1,10 +1,6 @@
-import { GenreItem } from "../movie-api/movie-api.interface";
+import { MainMessage } from "../../types";
+import { GenreItem } from "../../types/movie-api";
 import { ISessionService } from "./session.interface";
-
-export type MainMessage = {
-  messageId: number;
-  chatId: number;
-}
 
 export class SessionService implements ISessionService {
   private genres: GenreItem[] = [];

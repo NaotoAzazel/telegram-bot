@@ -1,13 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { SessionData } from "../context/context.interface";
-
-export type DefaultValues = {
-  startYear: number;
-  endYear: number;
-  minRating: number;
-  maxRating: number,
-  genre: number[];
-}
+import { DefaultValues, SessionData } from "../types";
 
 export const DEFAULT_VALUES: DefaultValues = {
   startYear: 1980,

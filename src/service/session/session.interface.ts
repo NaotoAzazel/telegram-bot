@@ -1,5 +1,5 @@
-import { GenreItem } from "../movie-api/movie-api.interface";
-import { MainMessage } from "./session.service";
+import { MainMessage } from "../../types";
+import { GenreItem } from "../../types/movie-api";
 
 export interface ISessionService {
   setLastMessageId(messageId: number): void;

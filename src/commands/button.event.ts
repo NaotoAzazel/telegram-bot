@@ -2,8 +2,8 @@ import { Telegraf } from "telegraf";
 import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session/session.interface";
-import { MainMessage } from "../service/session/session.service";
 import { CallbackQuery } from "telegraf/typings/core/types/typegram";
+import { MainMessage } from "../types";
 import Menu from "../config/menu.class";
 
 export default class ButtonEvent extends Command {

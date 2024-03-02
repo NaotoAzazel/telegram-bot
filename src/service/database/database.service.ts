@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import SessionModel, { DefaultValues } from "../../schema/session.schema";
-import { SessionData } from "../../context/context.interface";
+import SessionModel from "../../schema/session.schema";
+import { DefaultValues, SessionData } from "../../types";
 
-export type UpdateFields = Partial<Record<keyof DefaultValues, DefaultValues[keyof DefaultValues]>>;
+type UpdateFields = Partial<Record<keyof DefaultValues, DefaultValues[keyof DefaultValues]>>;
 
 export class DatabaseService {
   private static instance: DatabaseService | null = null;

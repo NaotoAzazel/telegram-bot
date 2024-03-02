@@ -1,13 +1,13 @@
 import { Telegraf } from "telegraf";
 import { Command } from "./command.class";
-import { IBotContext, SessionData } from "../context/context.interface";
+import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session/session.interface";
 import { ChosenInlineResult, InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
 import { generateNumberInlineQuery, generateTextInlineQuery, 
   generateMovieInlineQuery } from "../libs/utils";
 import { DEFAULT_VALUES } from "../schema/session.schema";
-import { MainMessage } from "../service/session/session.service";
 import { DatabaseService } from "../service/database/database.service";
+import { SessionData, MainMessage } from "../types";
 import Menu from "../config/menu.class";
 
 export default class InlineEvent extends Command {

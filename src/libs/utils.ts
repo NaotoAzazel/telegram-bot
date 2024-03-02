@@ -1,10 +1,10 @@
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
-import { GenreItem } from "../service/movie-api/movie-api.interface";
 import { MovieApiService } from "../service/movie-api/movie-api.service";
-import { SessionData } from "../context/context.interface";
-import { IMovieApi, MovieDetail, SearchMovie } from "../service/movie-api/movie-api.interface";
+import { IMovieApi } from "../service/movie-api/movie-api.interface";
 import { movieConfig } from "../config/movie";
 import { SessionService } from "../service/session/session.service";
+import { GenreItem, MovieDetail, SearchMovie } from "../types/movie-api";
+import { SessionData } from "../types";
 
 export async function generateNumberInlineQuery(
   start: number,

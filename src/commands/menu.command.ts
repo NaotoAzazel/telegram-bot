@@ -1,11 +1,12 @@
 import { Markup, Telegraf } from "telegraf";
 import { Command } from "./command.class";
-import { IBotContext, SessionData } from "../context/context.interface";
+import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session/session.interface";
-import { BUTTONS, ButtonItem } from "../config/ui-config.constants";
+import { BUTTONS } from "../config/ui-config.constants";
 import { callbackQuery } from "telegraf/filters"
 import { DatabaseService } from "../service/database/database.service";
-import { MainMessage } from "../service/session/session.service";
+import { MainMessage, SessionData } from "../types";
+import { ButtonItem } from "../types/ui";
 import Menu from "../config/menu.class";
 
 export default class MenuCommand extends Command {
