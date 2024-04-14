@@ -1,7 +1,8 @@
 import { Telegraf } from "telegraf";
-import { IBotContext, SessionData } from "../context/context.interface";
+import { IBotContext } from "../context/context.interface";
 import { convertIdToGenre } from "../libs/utils";
-import { MovieDetail } from "../service/movie-api/movie-api.interface";
+import { MovieDetail } from "../types/movie-api";
+import { SessionData } from "../types";
 
 export default new class Menu {
   createStartMenuText(): string {
@@ -9,7 +10,7 @@ export default new class Menu {
   }
 
   createMainMenuText(session: SessionData): string {
-    const date = session.createdAt;
+    const date: Date = new Date(session.createdAt);
     date.setHours(date.getHours());
 
     const options: Intl.DateTimeFormatOptions = {

@@ -2,27 +2,25 @@ import { Markup, Telegraf } from "telegraf";
 import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
 import { ISessionService } from "../service/session/session.interface";
-import { BUTTONS, ButtonItem } from "../config/ui-config.constants";
+import { BUTTONS } from "../config/ui-config.constants";
+import { DatabaseService } from "../service/database/database.service";
+import { ButtonItem } from "../types/ui";
 import Menu from "../config/menu.class";
-import { IDatabase } from "../service/database/database.interface";
 
 export default class StartCommand extends Command {
-  constructor(bot: Telegraf<IBotContext>, session: ISessionService, database: IDatabase) { 
-    super(bot, session, database);
+  constructor(bot: Telegraf<IBotContext>, session: ISessionService) { 
+    super(bot, session);
   }
 
   handle(): void {
     this.bot.start(async(ctx) => {
       try {
-        const id = ctx.from.id;
+        const id: number = ctx.from.id;
         const buttons = (BUTTONS.startMenu.buttons as ButtonItem[]).map(button => 
           Markup.button.callback(button.name, button.value)
         );
-  
-        const userSession = await this.database.findById(id);
-        if(!userSession) {
-          await this.database.create(id);
-        }
+          
+        await DatabaseService.findById(id);
   
         const startMenuText = Menu.createStartMenuText();
         const replyMessage = await ctx.reply(startMenuText, Markup.inlineKeyboard(buttons));

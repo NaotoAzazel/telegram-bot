@@ -1,13 +1,24 @@
+import { MainMessage } from "../../types";
+import { GenreItem } from "../../types/movie-api";
 import { ISessionService } from "./session.interface";
 
-export type MainMessage = {
-  messageId: number;
-  chatId: number;
-}
-
 export class SessionService implements ISessionService {
+  private genres: GenreItem[] = [];
   private lastMessageId: number = -1;
   private mainMessage: MainMessage = { messageId: -1, chatId: -1 };
+  private static instance: SessionService | null = null;
+
+  constructor() {
+    SessionService.instance = this;
+  }
+
+  static getInstance(): SessionService {
+    if(!SessionService.instance) {
+      SessionService.instance = new SessionService();
+    }
+
+    return SessionService.instance;
+  }
 
   setLastMessageId(messageId: number) {
     this.lastMessageId = messageId;
@@ -24,5 +35,13 @@ export class SessionService implements ISessionService {
 
   getMainMessage(): MainMessage {
     return this.mainMessage;
+  }
+
+  setGenres(genres: GenreItem[]): void {
+    this.genres = genres;
+  }
+
+  getGenres(): GenreItem[] {
+    return this.genres;
   }
 }

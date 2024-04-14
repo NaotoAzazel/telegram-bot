@@ -1,10 +1,10 @@
 import { InlineQueryResultArticle } from "telegraf/typings/core/types/typegram";
-import { GenreItem } from "../config/ui-config.constants";
 import { MovieApiService } from "../service/movie-api/movie-api.service";
-import { SessionData } from "../context/context.interface";
-import { IMovieApi, MovieDetail, SearchMovie } from "../service/movie-api/movie-api.interface";
-import { GENRES } from "../config/ui-config.constants";
+import { IMovieApi } from "../service/movie-api/movie-api.interface";
 import { movieConfig } from "../config/movie";
+import { SessionService } from "../service/session/session.service";
+import { GenreItem, MovieDetail, SearchMovie } from "../types/movie-api";
+import { SessionData } from "../types";
 
 export async function generateNumberInlineQuery(
   start: number,
@@ -146,8 +146,10 @@ export async function generateMovieInlineQuery(
 
 export const convertIdToGenre = (ids: number[]): string[] => {
   const result: string[] = [];
+  const genres = SessionService.getInstance().getGenres();
+
   for (const genreId of ids) { 
-    const genre = GENRES.find(genre => genre.id === genreId);
+    const genre = genres.find(genre => genre.id === genreId);
     if(genre) result.push(genre.name);
   }
   return result;

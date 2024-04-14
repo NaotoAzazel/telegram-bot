@@ -1,9 +1,10 @@
 import { IConfigService } from "../../config/config.interface";
 import { ConfigService } from "../../config/config.service";
-import { IMovieApi, SearchResult, MovieDetail } from "./movie-api.interface";
+import { IMovieApi } from "./movie-api.interface";
 import axios from "axios";
-import { SessionData } from "../../context/context.interface";
 import { movieConfig } from "../../config/movie";
+import { GenreItem, MovieDetail, SearchResult } from "../../types/movie-api";
+import { SessionData } from "../../types";
 
 export class MovieApiService implements IMovieApi {
   private accessToken: string;
@@ -104,6 +105,25 @@ export class MovieApiService implements IMovieApi {
   
       const response = await axios(options);
       return response.data;
+    } catch(err) {
+      throw new Error(err as string);
+    }
+  }
+
+  async getGenres(): Promise<GenreItem[]> {
+    try {
+      const options = {
+        method: "GET",
+        url: "https://api.themoviedb.org/3/genre/movie/list",
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${this.accessToken}`
+        },
+        params: this.basicParams
+      };
+
+      const response = await axios(options);
+      return response.data.genres;
     } catch(err) {
       throw new Error(err as string);
     }
