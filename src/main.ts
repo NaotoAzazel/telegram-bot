@@ -8,6 +8,7 @@ import { SessionService } from "./service/session/session.service";
 import { ICommandManager } from "./handler/commands.interface";
 import { CommandManager } from "./handler/commands.class";
 import { MovieApiService } from "./service/movie-api/movie-api.service";
+import { ExpressService } from "./service/express/express.service";
 
 class Bot {
   bot: Telegraf<IBotContext>;
@@ -35,4 +36,8 @@ class Bot {
 }
 
 const bot = new Bot(new ConfigService());
-bot.start()
+bot.start();
+
+const express = new ExpressService();
+express.connect();
+express.basicRequest();
