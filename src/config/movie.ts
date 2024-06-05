@@ -8,6 +8,6 @@ type MovieConfig = {
 export const movieConfig: MovieConfig = {
   baseImageUrl: "https://image.tmdb.org/t/p/w500/",
   notFoundImageUrl: "https://demofree.sirv.com/nope-not-here.jpg",
-  language: "ru",
+  language: "uk",
   includeAdult: false
 };

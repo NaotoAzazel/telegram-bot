@@ -4,9 +4,9 @@ import { convertIdToGenre } from "../libs/utils";
 import { MovieDetail } from "../types/movie-api";
 import { SessionData } from "../types";
 
-export default new class Menu {
+export default new (class Menu {
   createStartMenuText(): string {
-    return "Для начала роботы с ботом нажмите ниже";
+    return "Для початку роботи с ботом натисніть нижче";
   }
 
   createMainMenuText(session: SessionData): string {
@@ -16,31 +16,33 @@ export default new class Menu {
     const options: Intl.DateTimeFormatOptions = {
       day: "2-digit",
       month: "2-digit",
-      year: "numeric"
+      year: "numeric",
     };
-    const formattedDate = new Intl.DateTimeFormat("ru-RU", options).format(date);
+    const formattedDate = new Intl.DateTimeFormat("ru-RU", options).format(
+      date
+    );
 
-    return `🆔 ${session.id}\n🕗 Дата регистрации ${formattedDate}\n\nПриятного поиска!`;
+    return `🆔 ${session.id}\n🕗 Дата реєстрації ${formattedDate}\n\nПриємного пошуку!`;
   }
 
   createFilterMenuText(session: SessionData): string {
-    const genre = !session.genre.length 
-      ? "Все"
+    const genre = !session.genre.length
+      ? "Усі"
       : convertIdToGenre(session.genre).join(", ");
-      
+
     return (
-      "Меню фильтров\n\n" +
-      "Выбери фильтры и жми \"Искать по фильтру\`\n\n" +
-      "Выбрано:\n" +
+      "Меню фільтрів\n\n" +
+      "Вибери фільтри і тисни \"Шукати за фільтром\"\n\n" +
+      "Обрано:\n" +
       `📈 Рейтинг: ${session.minRating} - ${session?.maxRating}\n` +
-      `📅 Начиная с года: ${session.startYear}\n` +
-      `📆 До года: ${session.endYear}\n` +
+      `📅 Починаючи з року: ${session.startYear}\n` +
+      `📆 До року: ${session.endYear}\n` +
       `🎵 Жанр: ${genre}\n`
     );
   }
 
   createErrorMenu(): string {
-    return "Это сообщение больше не доступно для взимодействия с ним, отправьте команду /start для начала роботы.";
+    return "Це повідомлення більше не доступне для взаємодії з ним, надішліть команду /start для початку роботи.";
   }
 
   createMovieMenu(fields: MovieDetail): string {
@@ -50,26 +52,31 @@ export default new class Menu {
       `${fields.title}\n\n` +
       `Жанр: ${genres.join(", ")}\n` +
       `Рейтинг: ${fields.vote_average || "Не найдено"}\n` +
-      `Вышел: ${fields.status}\n` +
-      `Описание:\n${fields.overview}`
+      `Вийшов: ${fields.status}\n` +
+      `Опис:\n${fields.overview}`
     );
   }
 
-  updateMenuText(bot: Telegraf<IBotContext>, userId: number, data: "menu" | "filter" | "movie", id?: string): void {
+  updateMenuText(
+    bot: Telegraf<IBotContext>,
+    userId: number,
+    data: "menu" | "filter" | "movie",
+    id?: string
+  ): void {
     const uniqueNumber: number = new Date().getTime();
     bot.handleUpdate({
       update_id: uniqueNumber,
       callback_query: {
         id: id || uniqueNumber.toString(),
-        from: { 
-          id: userId, 
-          is_bot: false, 
-          first_name: uniqueNumber.toString()
-        }, 
+        from: {
+          id: userId,
+          is_bot: false,
+          first_name: uniqueNumber.toString(),
+        },
         message: undefined,
         chat_instance: uniqueNumber.toString(),
-        data
-      }
+        data,
+      },
     });
   }
-}
+})();

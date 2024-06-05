@@ -9,35 +9,27 @@ type ButtonsConfig = {
 
 export const BUTTONS: ButtonsConfig = {
   startMenu: {
-    buttons: [
-      { name: "📃 Открыть меню", value: "menu" }
-    ],
+    buttons: [{ name: "📃 Відкрити меню", value: "menu" }],
   },
   mainMenu: {
-    buttons: [
-      { name: "Фильтр", value: "filter" },
-    ],
-    switchToInline: [
-      { name: "Начать поиск", value: "" },
-    ]
+    buttons: [{ name: "Фільтр", value: "filter" }],
+    switchToInline: [{ name: "Почати пошук", value: "" }],
   },
   filterMenu: {
     switchToInline: [
-      { name: "Рейтинг от", value: "filter_minRating" },
+      { name: "Рейтинг від", value: "filter_minRating" },
       { name: "Рейтинг до", value: "filter_maxRating" },
-      { name: "Год от", value: "filter_startYear" },
-      { name: "Год до", value: "filter_endYear" },
-      { name: "Выбрать жанр", value: "filter_genre" },
-      { name: "Искать по фильтру", value: "filter" }
+      { name: "Рік від", value: "filter_startYear" },
+      { name: "Рік до", value: "filter_endYear" },
+      { name: "Вибрати жанр", value: "filter_genre" },
+      { name: "Шукати за фільтром", value: "filter" },
     ],
     buttons: [
-      { name: "Сбросить", value: "reset" },
-      { name: "Назад", value: "menu" }
-    ]
+      { name: "Скинути", value: "reset" },
+      { name: "Назад", value: "menu" },
+    ],
   },
   movieMenu: {
-    buttons: [
-      { name: "Назад", value: "redirect_menu" }
-    ]
-  }
-}
+    buttons: [{ name: "Назад", value: "redirect_menu" }],
+  },
+};

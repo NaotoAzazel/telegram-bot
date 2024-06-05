@@ -15,25 +15,27 @@ export async function generateNumberInlineQuery(
 ): Promise<InlineQueryResultArticle[]> {
   const result: InlineQueryResultArticle[] = [];
 
-  for(let i = start; i <= end; i += step) {
+  for (let i = start; i <= end; i += step) {
     let formattedId: number | string = i;
     let formattedTitle: string;
 
-    switch(type) {
+    switch (type) {
       case "startYear":
       case "endYear": {
-        formattedTitle = session[type] === formattedId
-          ? `(Выбрано) ${formattedId}`
-          : `${formattedId}`;
+        formattedTitle =
+          session[type] === formattedId
+            ? `(Обрано) ${formattedId}`
+            : `${formattedId}`;
         break;
       }
 
       case "maxRating":
       case "minRating": {
         formattedId = formattedId.toFixed(1);
-        formattedTitle = session[type].toFixed(1) === formattedId
-          ? `(Выбрано) ${formattedId}`
-          : `${formattedId}`;
+        formattedTitle =
+          session[type].toFixed(1) === formattedId
+            ? `(Обрано) ${formattedId}`
+            : `${formattedId}`;
         break;
       }
     }
@@ -43,8 +45,8 @@ export async function generateNumberInlineQuery(
       id: formattedId.toString(),
       title: formattedTitle,
       input_message_content: {
-        message_text: `Вы успешно изменили значение ${type} на ${formattedId}`,
-      }
+        message_text: `Ви успішно змінили значення ${type} на ${formattedId}`,
+      },
     });
   }
 
@@ -58,38 +60,37 @@ export async function generateTextInlineQuery(
 ): Promise<InlineQueryResultArticle[]> {
   const result: InlineQueryResultArticle[] = [];
 
-  for(const genre of genres) {
-    const formattedTitle = session.genre.indexOf(genre.id) !== -1
-      ? `(Выбрано) ${genre.name}`
-      : genre.name;
+  for (const genre of genres) {
+    const formattedTitle =
+      session.genre.indexOf(genre.id) !== -1
+        ? `(Обрано) ${genre.name}`
+        : genre.name;
 
     result.push({
       type: "article",
       id: genre.id.toString(),
       title: formattedTitle,
       input_message_content: {
-        message_text: `Вы успешно изменили значение ${type} на ${genre.name}`,
-      }
+        message_text: `Ви успішно змінили значення ${type} на ${genre.name}`,
+      },
     });
   }
 
   return result;
 }
 
-export async function generateMovieInlineQuery(
-  options: {
-    searchType: "search" | "searchByParams" | "searchByTitle";
-    id?: number;
-    fields?: SessionData;
-    title?: string;
-  }
-): Promise<InlineQueryResultArticle[]> {
+export async function generateMovieInlineQuery(options: {
+  searchType: "search" | "searchByParams" | "searchByTitle";
+  id?: number;
+  fields?: SessionData;
+  title?: string;
+}): Promise<InlineQueryResultArticle[]> {
   const { searchType, id, fields, title } = options;
   const result: InlineQueryResultArticle[] = [];
   const apiService: IMovieApi = new MovieApiService();
   let movies: SearchMovie[] | MovieDetail[] = [];
 
-  switch(searchType) {
+  switch (searchType) {
     case "search": {
       movies = (await apiService.search()).results;
       break;
@@ -106,25 +107,27 @@ export async function generateMovieInlineQuery(
     }
   }
 
-  if(!movies.length) {
+  if (!movies.length) {
     result.push({
       type: "article",
       id: "not found",
-      title: "Ничего не найдено",
-      description: "Попробуйте ввести другой запрос или изменить фильтры",
+      title: "Нічого не знайдено...",
+      description: "Спробуйте ввести інший запит або змінити фільтри",
       input_message_content: {
         message_text: "text",
       },
-    })
+    });
     return result;
   }
 
-  for(let i = 0; i < movies.length; i++) {
+  for (let i = 0; i < movies.length; i++) {
     const movie = movies[i];
-    const description = 
-      `${movie.release_date} | ` + 
-      `${movie.vote_average} | ` + 
-      `${movie.genre_ids?.length && convertIdToGenre(movie.genre_ids).join(", ")}`;
+    const description =
+      `${movie.release_date} | ` +
+      `${movie.vote_average} | ` +
+      `${
+        movie.genre_ids?.length && convertIdToGenre(movie.genre_ids).join(", ")
+      }`;
 
     result.push({
       type: "article",
@@ -134,10 +137,11 @@ export async function generateMovieInlineQuery(
         message_text: "text",
       },
       description,
-      thumbnail_url: 
-        movie.poster_path ? `${movieConfig.baseImageUrl}${movie.poster_path}` : movieConfig.notFoundImageUrl,
+      thumbnail_url: movie.poster_path
+        ? `${movieConfig.baseImageUrl}${movie.poster_path}`
+        : movieConfig.notFoundImageUrl,
       thumbnail_height: 32,
-      thumbnail_width: 32
+      thumbnail_width: 32,
     });
   }
 
@@ -148,9 +152,9 @@ export const convertIdToGenre = (ids: number[]): string[] => {
   const result: string[] = [];
   const genres = SessionService.getInstance().getGenres();
 
-  for (const genreId of ids) { 
-    const genre = genres.find(genre => genre.id === genreId);
-    if(genre) result.push(genre.name);
+  for (const genreId of ids) {
+    const genre = genres.find((genre) => genre.id === genreId);
+    if (genre) result.push(genre.name);
   }
   return result;
-}
+};
